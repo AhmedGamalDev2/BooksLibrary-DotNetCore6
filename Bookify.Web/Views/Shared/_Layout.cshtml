@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="~/assets/css/plugins.bundle.css" type="text/css" />
     <link rel="stylesheet" href="~/assets/css/style.bundle.css" type="text/css" />
     <!--end::Global Stylesheets Bundle-->
+    <link href="~/lib/toastr.js/toastr.min.css" rel="stylesheet" />
+    <link href="~/lib/animate.css/animate.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Bookify.Web.styles.css" asp-append-version="true" />
 </head>
@@ -57,13 +59,18 @@
 			<!--end::Svg Icon-->
 		</div>
 		<!--end::Scrolltop-->
-
+		//attention to space because space is not == ""
+	<span class="d-none" id="SuccessMessage">@TempData["SuccessMessage"]</span>
     <script>var hostUrl = "assets/";</script>
     <!--begin::Global Javascript Bundle(used by all pages)-->
     <script src="~/assets/js/plugins.bundle.js"></script>
     <script src="~/assets/js/scripts.bundle.js"></script>
     <!--end::Global Javascript Bundle-->
+	//bootbox for alerts
+    <script src="~/lib/bootbox.js/bootbox.min.js"></script>
+    <script src="~/lib/toastr.js/toastr.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

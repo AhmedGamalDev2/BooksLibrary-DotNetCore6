@@ -1,6 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace Bookify.Web.Data
 {

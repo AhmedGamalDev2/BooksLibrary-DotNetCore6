@@ -23,6 +23,33 @@
         "js/bootstrap.js.map",
         "js/bootstrap.min.js.map"
       ]
+    },
+    {
+      "library": "bootbox.js@6.0.0",
+      "destination": "wwwroot/lib/bootbox.js/"
+    },
+    {
+      "library": "animate.css@4.1.1",
+      "destination": "wwwroot/lib/animate.css/",
+      "files": [
+        "animate.min.css",
+        "animate.css"
+      ]
+    },
+    {
+      "provider": "unpkg",
+      "library": "sweetalert2@11.10.1",
+      "destination": "wwwroot/lib/sweetalert2/",
+      "files": [
+        "dist/sweetalert2.min.js",
+        "dist/sweetalert2.min.css",
+        "dist/sweetalert2.js",
+        "dist/sweetalert2.css"
+      ]
+    },
+    {
+      "library": "toastr.js@2.1.4",
+      "destination": "wwwroot/lib/toastr.js/"
     }
   ]
 }
