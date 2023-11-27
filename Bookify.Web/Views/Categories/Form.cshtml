@@ -9,7 +9,7 @@
     <div class="card-body">
         <div class="row">
             <div class="col-md-4">
-                <form method="post" asp-controller="Categories">
+                <form method="post" asp-controller="Categories" >
                     @if(Model?.Id > 0)
                     {
                         <input type="hidden" asp-for="Id" />
@@ -22,7 +22,7 @@
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-sm">
+                    <button type="submit" class="btn btn-primary btn-sm"  >
                         <i class="bi bi-check2"></i>
                         Save
                     </button>
@@ -35,4 +35,5 @@
 @section Scripts
 {
     <partial name="_ValidationScriptsPartial" />
+
 }

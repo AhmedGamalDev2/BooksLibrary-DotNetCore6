@@ -17,10 +17,17 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Bookify.Web.styles.css" asp-append-version="true" />
 </head>
-<body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed">
+<body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed page-loading">
     <!--begin::Theme mode setup on page load-->
 		<script>var defaultThemeMode = "light"; var themeMode; if ( document.documentElement ) { if ( document.documentElement.hasAttribute("data-theme-mode")) { themeMode = document.documentElement.getAttribute("data-theme-mode"); } else { if ( localStorage.getItem("data-theme") !== null ) { themeMode = localStorage.getItem("data-theme"); } else { themeMode = defaultThemeMode; } } if (themeMode === "system") { themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; } document.documentElement.setAttribute("data-theme", themeMode); }</script>
 		<!--end::Theme mode setup on page load-->
+	<!--begin::spinner loader-->
+	<div class="page-loader">
+		<span class="spinner-border text-primary" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</span>
+	</div>
+	<!--end::spinner loader-->
 		<!--begin::Main-->
 		<!--begin::Root-->
 		<div class="d-flex flex-column flex-root">

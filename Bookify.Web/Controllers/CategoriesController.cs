@@ -1,22 +1,39 @@
 ﻿
- 
 namespace Bookify.Web.Controllers
 { //Hello
     public class CategoriesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public CategoriesController(ApplicationDbContext context)
+        public CategoriesController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
         public IActionResult Index()
         {
             //TODO: use viewModel
-            var categories = _context.Categories.AsNoTracking().ToList();
-            return View(categories);
+            var categories = _context.Categories.AsNoTracking() .ToList();
+            //map categories to IEnumerable<CategoryViewModel>>
+            var categoriesViewModel = _mapper.Map<IEnumerable<CategoryViewModel>>(categories);
+            return View(categoriesViewModel);
+            #region without automapper
+            //var categories = _context.Categories
+            //   .Select(c => new CategoryViewModel
+            //   {
+            //       Id = c.Id,
+            //       Name = c.Name,
+            //       IsDeleted = c.IsDeleted,
+            //       CreatedOn = c.CreatedOn,
+            //       LastUpdatedOn = c.LastUpdatedOn,
+            //   })
+            //   .AsNoTracking()
+            //   .ToList();
+            //return View(categories);
+            #endregion
         }
 
         [HttpGet]
@@ -31,8 +48,12 @@ namespace Bookify.Web.Controllers
         {
             if (!ModelState.IsValid)
                 return View("Form", model);
+            //convert model(CategoryFormViewModel) to Category
+            var category = _mapper.Map<Category>(model);
 
-            var category = new Category { Name = model.Name };
+            #region mapping without automapper
+            //var category = new Category { Name = model.Name };
+            #endregion
             _context.Add(category);
             _context.SaveChanges();
             TempData["SuccessMessage"] = "Saved Successfully: " + category.Name;
@@ -46,14 +67,16 @@ namespace Bookify.Web.Controllers
 
             if (category is null)
                 return NotFound();
-
-            var viewModel = new CategoryFormViewModel
-            {
-                Id = id,
-                Name = category.Name
-            };
-
+            var viewModel = _mapper.Map<CategoryFormViewModel>(category);
             return View("Form", viewModel);
+            #region mapping without automapper
+            //var viewModel = new CategoryFormViewModel
+            //{
+            //    Id = id,
+            //    Name = category.Name
+            //};
+            #endregion
+
         }
 
         [HttpPost]
@@ -67,8 +90,11 @@ namespace Bookify.Web.Controllers
 
             if (category is null)
                 return NotFound();
-
-            category.Name = model.Name;
+            
+            category = _mapper.Map(model,category); //(specially in Edit) not _mapper.Map<Category>(model); ..error
+            #region mapping without automapper
+            //category.Name = model.Name;
+            #endregion
             category.LastUpdatedOn = DateTime.Now;
 
             _context.SaveChanges();
@@ -89,7 +115,13 @@ namespace Bookify.Web.Controllers
             _context.SaveChanges();
             return Ok(category);
         }
+        public IActionResult AllowCategory(CategoryFormViewModel model)
+        {
+            var category = _context.Categories.SingleOrDefault(c => c.Name == model.Name);
+            var isAllowed = category is null || category.Id.Equals(model.Id);
 
+            return Json(isAllowed);
+        }
 
     }
 }

@@ -48,11 +48,11 @@ var KTDatatables = function () {
         // Init datatable --- more info on datatables: https://datatables.net/manual/
         datatable = $(table).DataTable({
             "info": false,
-            'order': [],
+            //default => sort by Name or first column
+            //'order': [], // prevent default sorting by at least first column (Name)
             'pageLength': 10,
             'columnDefs': [
-                { 'orderable': false, 'targets': -1 },  // آخر عمود (أزرار العمليات)
-               // { 'orderable': false, 'targets': -2 }   // قبل آخر عمود (أزرار الحالة)
+                { 'orderable': false, 'targets': -1 },  // آخر عمود (أزرار العمليات) ... action column(edit,status)
             ]
         });
     }
