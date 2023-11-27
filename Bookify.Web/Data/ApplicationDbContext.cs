@@ -10,6 +10,8 @@ namespace Bookify.Web.Data
             : base(options) { }
 
         #region DbSet
+        public virtual DbSet<Author> Authors { get; set; }
+
         public virtual DbSet<Category> Categories { get; set; }
         #endregion
 

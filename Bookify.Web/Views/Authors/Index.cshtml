@@ -1,0 +1,164 @@
+﻿@model IEnumerable<AuthorViewModel>
+
+@{
+    ViewData["Title"] = "Authors";
+}
+@section Styles{
+    <link href="~/assets/plugins/datatables/datatables.bundle.css" rel="stylesheet" />
+}
+
+<div class="card shadow-sm">
+    @*start: datatable header card *@
+    <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+        <div class="card-title">
+            <!--begin::Search-->
+            <div class="d-flex align-items-center position-relative my-1">
+                <span class="svg-icon fs-1 position-absolute ms-4">
+                    <i class="bi bi-search text-primary"></i>
+                </span>
+                <input type="text" data-kt-filter="search" class="form-control form-control-solid w-250px ps-14" placeholder="Search " />
+            </div>
+            <!--end::Search-->
+            <!--begin::Export buttons-->
+            <div id="kt_datatable_example_1_export" class="d-none"></div>
+            <!--end::Export buttons-->
+        </div>
+        <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+
+            <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                <i class="bi bi-box-arrow-down">  <span class="path1"></span><span class="path2"></span></i>
+                Export
+            </button>
+
+            <div id="kt_datatable_example_export_menu" class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4" data-kt-menu="true">
+
+                <div class="menu-item px-3">
+                    <a href="#" class="menu-link px-3" data-kt-export="copy">
+                        Copy to clipboard
+                    </a>
+                </div>
+
+                <div class="menu-item px-3">
+                    <a href="#" class="menu-link px-3" data-kt-export="excel">
+                        Export as Excel
+                    </a>
+                </div>
+
+                <div class="menu-item px-3">
+                    <a href="#" class="menu-link px-3" data-kt-export="csv">
+                        Export as CSV
+                    </a>
+                </div>
+
+                <div class="menu-item px-3">
+                    <a href="#" class="menu-link px-3" data-kt-export="pdf">
+                        Export as PDF
+                    </a>
+                </div>
+
+            </div>
+
+            <div id="kt_datatable_example_buttons" class="d-none"></div>
+
+        </div>
+    </div>
+    @*end :: datatable header card *@
+    @********second header card  ************@
+    <div class="card-header">
+        <h3 class="card-title">
+            <div class="symbol symbol-40px me-4">
+                <div class="symbol-label fs-2 fw-semibold text-success">
+                    <!--begin::Svg Icon | path: icons/duotune/general/gen002.svg-->
+                    <span class="svg-icon svg-icon-2 svg-icon-primary">
+                        <svg width="26" height="28" viewBox="0 0 26 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.8254 27.3337H4.17203C3.1536 27.3337 2.17688 26.9291 1.45674 26.2089C0.736602 25.4888 0.332031 24.5121 0.332031 23.4937V4.50699C0.332031 3.48856 0.736602 2.51184 1.45674 1.7917C2.17688 1.07156 3.1536 0.666992 4.17203 0.666992H17.8254C18.8438 0.666992 19.8205 1.07156 20.5407 1.7917C21.2608 2.51184 21.6654 3.48856 21.6654 4.50699V23.4937C21.6654 24.5121 21.2608 25.4888 20.5407 26.2089C19.8205 26.9291 18.8438 27.3337 17.8254 27.3337ZM10.9987 7.33366C10.4713 7.33366 9.95571 7.49006 9.51718 7.78307C9.07865 8.07609 8.73685 8.49257 8.53502 8.97984C8.33319 9.46711 8.28038 10.0033 8.38327 10.5206C8.48616 11.0378 8.74014 11.513 9.11308 11.8859C9.48602 12.2589 9.96117 12.5129 10.4785 12.6158C10.9957 12.7186 11.5319 12.6658 12.0192 12.464C12.5065 12.2622 12.9229 11.9204 13.216 11.4818C13.509 11.0433 13.6654 10.5277 13.6654 10.0003C13.6654 9.29308 13.3844 8.6148 12.8843 8.11471C12.3842 7.61461 11.7059 7.33366 10.9987 7.33366ZM15.3587 19.3337C15.5794 19.347 15.8 19.3052 16.0005 19.2121C16.2011 19.1189 16.3753 18.9774 16.5076 18.8002C16.6398 18.623 16.7259 18.4157 16.7581 18.1969C16.7903 17.9781 16.7676 17.7548 16.692 17.547C16.2027 16.4571 15.3998 15.5378 14.3858 14.9061C13.3718 14.2744 12.1926 13.9591 10.9987 14.0003C9.81328 13.9677 8.64459 14.2856 7.63898 14.9141C6.63337 15.5426 5.83553 16.4538 5.34537 17.5337C4.9987 18.4003 5.70536 19.3337 7.38536 19.3337H15.3587ZM24.332 12.667H22.9987V18.0003H24.332C24.6857 18.0003 25.0248 17.8598 25.2748 17.6098C25.5249 17.3598 25.6654 17.0206 25.6654 16.667V14.0003C25.6654 13.6467 25.5249 13.3076 25.2748 13.0575C25.0248 12.8075 24.6857 12.667 24.332 12.667ZM24.332 4.66699H22.9987V10.0003H24.332C24.6857 10.0003 25.0248 9.85985 25.2748 9.6098C25.5249 9.35975 25.6654 9.02061 25.6654 8.66699V6.00033C25.6654 5.6467 25.5249 5.30756 25.2748 5.05752C25.0248 4.80747 24.6857 4.66699 24.332 4.66699Z" fill="currentColor" />
+                        </svg>
+                    </span>
+                    <!--end::Svg Icon-->
+                </div>
+            </div>
+            Authors
+        </h3>
+        <div class="card-toolbar">
+            <a asp-controller="Authors" asp-action="Create" class="btn btn-sm btn-primary">
+                <i class="bi bi-plus-square-dotted"></i>
+                Add
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body pt-0">
+        @if (!Model.Any())
+        {
+            <div class="alert alert-dismissible bg-light-warning border border-warning border-dashed d-flex flex-column flex-sm-row w-100 p-5 mb-10">
+                <!--begin::Icon-->
+                <!--begin::Svg Icon | path: icons/duotune/communication/com003.svg-->
+                <span class="svg-icon svg-icon-2hx svg-icon-warning me-4 mb-5 mb-sm-0">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect opacity="0.3" x="2" y="2" width="20" height="20" rx="10" fill="currentColor" />
+                        <rect x="11" y="14" width="7" height="2" rx="1" transform="rotate(-90 11 14)" fill="currentColor" />
+                        <rect x="11" y="17" width="2" height="2" rx="1" transform="rotate(-90 11 17)" fill="currentColor" />
+                    </svg>
+                </span>
+                <!--end::Svg Icon-->
+                <!--end::Icon-->
+                <!--begin::Content-->
+                <div class="d-flex flex-column pe-0 pe-sm-10 align-self-center">
+                    <h5 class="mb-1">No authors found!</h5>
+                </div>
+                <!--end::Content-->
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-row-dashed table-row-gray-300 gy-7 js-datatables" data-datatable-title="Authors export">
+                    <thead>
+                        <tr class="fw-bold fs-6 text-gray-800">
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>Created On</th>
+                            <th>Last Updated On</th>
+                            <th class="js-no-export">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var author in Model)
+                        {
+                            <tr>
+                                <td>@author.Name</td>
+                                <td>
+                                    <span class=" badge badge-light-@(author.IsDeleted ? "danger" : "success") jsStatus">
+                                        @(author.IsDeleted ? "Deleted" : "Available")
+                                    </span>
+                                </td>
+                                <td>@author.CreatedOn</td>
+                                <td class="js-updated-on">@author.LastUpdatedOn</td>
+                                <td>
+                                    <div class="dropdown ">
+                                        <button class="btn btn-secondary dropdown-toggle show" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="true">
+                                            Action
+                                        </button>
+
+                                        <ul class="dropdown-menu  " aria-labelledby="dropdownMenuButton1" style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(0px, 39px);" data-popper-placement="bottom-start">
+                                            <li><a class="dropdown-item" asp-controller="Authors" asp-action="Edit" asp-route-id="@author.Id">Edit</a></li>
+                                            <li><a class="dropdown-item js-toggle-status" data-id="@author.Id" href="javascript:;">Toggle Status</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+@section Plugins{
+    <script src="~/assets/plugins/datatables/datatables.bundle.js"></script>
+}
+@Html.AntiForgeryToken();
+
+@section Scripts{
+    <script src="~/js/authors.js" asp-append-version="true"></script> @*f11-v1*@
+}

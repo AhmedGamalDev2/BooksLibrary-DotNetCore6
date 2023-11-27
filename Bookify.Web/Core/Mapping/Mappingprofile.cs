@@ -6,6 +6,7 @@ namespace Bookify.Web.Core.Mapping
     {
         public Mappingprofile()
         {
+            //Category
             //map from Category to CategoryViewModel
             CreateMap<Category, CategoryViewModel>();
                 //.ForMember(destination=> destination.CategoryName,opt=>opt.MapFrom(sourceMember => sourceMember.Name)); // in case the property not same name in Category and CategoryViewModel
@@ -14,7 +15,9 @@ namespace Bookify.Web.Core.Mapping
             //map from CategoryFormViewModel to Category OR convert Category to CategoryFormViewModel
             CreateMap<CategoryFormViewModel, Category>().ReverseMap();//ReverseMap inseated of ( CreateMap<Category, CategoryFormViewModel>();) // 
 
-
+            //Author
+            CreateMap<Author, AuthorViewModel>();
+            CreateMap<AuthorFormViewModel, Author>().ReverseMap();
         }
     }
 }
