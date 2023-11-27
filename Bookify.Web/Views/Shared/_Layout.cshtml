@@ -13,6 +13,7 @@
     <!--end::Global Stylesheets Bundle-->
     <link href="~/lib/toastr.js/toastr.min.css" rel="stylesheet" />
     <link href="~/lib/animate.css/animate.min.css" rel="stylesheet" />
+	@await RenderSectionAsync("Styles", required: false)
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Bookify.Web.styles.css" asp-append-version="true" />
 </head>
@@ -69,6 +70,8 @@
 	//bootbox for alerts
     <script src="~/lib/bootbox.js/bootbox.min.js"></script>
     <script src="~/lib/toastr.js/toastr.min.js"></script>
+	@await RenderSectionAsync("Plugins", required: false)
+
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 

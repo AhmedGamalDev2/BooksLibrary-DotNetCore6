@@ -9,7 +9,8 @@
 				<!--begin:Menu item-->
 				<div class="menu-item">
 					<!--begin:Menu link-->
-					<a class="menu-link active" href="/">
+					<!--active-when is custom helper tag-->
+					<a class="menu-link " active-when="Home" href="/">  @*@if (ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["Action"]?.ToString() =="Index") { <text>active</text> }*@
 						<span class="menu-icon">
 							<!--begin::Svg Icon | path: icons/duotune/general/gen002.svg-->
 							<span class="svg-icon svg-icon-2">
@@ -28,7 +29,7 @@
 				<!--begin:Menu item-->
 				<div class="menu-item">
 					<!--begin:Menu link-->
-					<a class="menu-link  " asp-controller="Categories" asp-action="Index">
+					<a class="menu-link @if(ViewContext.RouteData.Values["Controller"]?.ToString() == "Categories" &&ViewContext.RouteData.Values["Action"]?.ToString() == "Index"  ){ <text>active</text> }   "   asp-controller="Categories" asp-action="Index">
 						<span class="menu-icon">
 							<!--begin::Svg Icon | path: icons/duotune/general/gen002.svg-->
 							<span class="svg-icon svg-icon-2">
