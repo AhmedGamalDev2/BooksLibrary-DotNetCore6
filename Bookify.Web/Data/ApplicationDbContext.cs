@@ -11,9 +11,16 @@ namespace Bookify.Web.Data
 
         #region DbSet
         public virtual DbSet<Author> Authors { get; set; }
-
+        public virtual DbSet<Book> Books { get; set; }
+        public virtual DbSet<BookCategory> BookCategories { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         #endregion
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<BookCategory>(e => e.HasKey(b => new {b.BookId,b.CategoryId})); // assign primary key for BookCategory entity 
+            base.OnModelCreating(builder);
+        }
 
     }
 }

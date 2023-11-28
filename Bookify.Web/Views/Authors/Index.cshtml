@@ -9,59 +9,7 @@
 
 <div class="card shadow-sm">
     @*start: datatable header card *@
-    <div class="card-header align-items-center py-5 gap-2 gap-md-5">
-        <div class="card-title">
-            <!--begin::Search-->
-            <div class="d-flex align-items-center position-relative my-1">
-                <span class="svg-icon fs-1 position-absolute ms-4">
-                    <i class="bi bi-search text-primary"></i>
-                </span>
-                <input type="text" data-kt-filter="search" class="form-control form-control-solid w-250px ps-14" placeholder="Search " />
-            </div>
-            <!--end::Search-->
-            <!--begin::Export buttons-->
-            <div id="kt_datatable_example_1_export" class="d-none"></div>
-            <!--end::Export buttons-->
-        </div>
-        <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
-
-            <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
-                <i class="bi bi-box-arrow-down">  <span class="path1"></span><span class="path2"></span></i>
-                Export
-            </button>
-
-            <div id="kt_datatable_example_export_menu" class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4" data-kt-menu="true">
-
-                <div class="menu-item px-3">
-                    <a href="#" class="menu-link px-3" data-kt-export="copy">
-                        Copy to clipboard
-                    </a>
-                </div>
-
-                <div class="menu-item px-3">
-                    <a href="#" class="menu-link px-3" data-kt-export="excel">
-                        Export as Excel
-                    </a>
-                </div>
-
-                <div class="menu-item px-3">
-                    <a href="#" class="menu-link px-3" data-kt-export="csv">
-                        Export as CSV
-                    </a>
-                </div>
-
-                <div class="menu-item px-3">
-                    <a href="#" class="menu-link px-3" data-kt-export="pdf">
-                        Export as PDF
-                    </a>
-                </div>
-
-            </div>
-
-            <div id="kt_datatable_example_buttons" class="d-none"></div>
-
-        </div>
-    </div>
+    <partial name="_DatatablesCardHeader">
     @*end :: datatable header card *@
     @********second header card  ************@
     <div class="card-header">
