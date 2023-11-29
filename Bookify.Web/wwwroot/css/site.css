@@ -16,3 +16,10 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/* start override on theme .. author form**/
+
+.form-floating > .form-select {
+    
+    padding-bottom: 0.225rem;
+    /*end override on theme .. author form**/

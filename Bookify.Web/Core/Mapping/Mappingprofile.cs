@@ -31,7 +31,9 @@ namespace Bookify.Web.Core.Mapping
               .ForMember(destListItem => destListItem.Text, options => options.MapFrom(sourceAuthor => sourceAuthor.Name));
 
             //Book
-            CreateMap<BookFormViewModel, Book>();
+            CreateMap<BookFormViewModel, Book>()
+                .ReverseMap()
+                .ForMember(dest=>dest.Categories,opt=>opt.Ignore()); //this is because there are two the same name with (Categories) in Category and CategoryFormViewModel with different type
 
         }
     }
