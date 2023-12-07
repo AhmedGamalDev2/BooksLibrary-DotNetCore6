@@ -181,6 +181,13 @@ namespace Bookify.Web.Controllers
         }
 
 
+        public IActionResult AllowBook(BookFormViewModel model)
+        {
+            var book = _context.Books.SingleOrDefault(b=> b.Title == model.Title && b.AuthorId == model.AuthorId);
+            var isAllowed = book is null || book.Id.Equals(model.Id);
+
+            return Json(isAllowed);
+        }
 
 
 

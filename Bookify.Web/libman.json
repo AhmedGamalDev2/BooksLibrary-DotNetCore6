@@ -50,6 +50,10 @@
     {
       "library": "toastr.js@2.1.4",
       "destination": "wwwroot/lib/toastr.js/"
+    },
+    {
+      "library": "expressive-annotations-validate@2.7.0",
+      "destination": "wwwroot/lib/expressive-annotations-validate/"
     }
   ]
 }

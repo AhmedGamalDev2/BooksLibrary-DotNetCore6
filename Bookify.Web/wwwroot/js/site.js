@@ -136,6 +136,27 @@ var KTDatatables = function () {
 
 
 $(document).ready(function () {
+    //tinymce textarea
+    var options = { selector: ".js-tinymce", height: "422" };
+
+    if (KTThemeMode.getMode() === "dark") {
+        options["skin"] = "oxide-dark";
+        options["content_css"] = "dark";
+    }
+
+    tinymce.init(options);
+    //datepicker
+    $('.js-datepicker').daterangepicker({
+        singleDatePicker: true,
+        autoApply: true,
+        drops:'up',
+        maxDate: new Date()
+    })
+
+
+    //Select2
+    $('.js-select2').select2();
+
     /**start datatable*/
     //$('table').DataTable();
     KTUtil.onDOMContentLoaded(function () {
