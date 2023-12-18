@@ -1,6 +1,10 @@
 ﻿using Bookify.Web.Core.Consts;
+using Bookify.Web.Settings;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Options;
 
 namespace Bookify.Web.Controllers
 {
@@ -9,14 +13,23 @@ namespace Bookify.Web.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IMapper _mapper;
+        private readonly Cloudinary _cloudinary;
         private List<string> _allowedExtensions = new() { ".jpg", ".jpeg", ".png" };
         private int _maxAllowedSize = 2097152;
 
-        public BooksController(ApplicationDbContext context, IMapper mapper, IWebHostEnvironment webHostEnvironment)
+        public BooksController(ApplicationDbContext context, IMapper mapper, IWebHostEnvironment webHostEnvironment, IOptions<CloudinarySettings> cloudinary)
         {
             _context = context;
             _mapper = mapper;
             _webHostEnvironment = webHostEnvironment;
+            var account = new Account // account on cloudinary
+            { //map data from cloudinarysetting to cloudinary account 
+                Cloud = cloudinary.Value.Cloud,
+                ApiKey = cloudinary.Value.ApiKey,
+                ApiSecret = cloudinary.Value.ApiSecret
+
+            };
+            _cloudinary = new Cloudinary(account);
         }
 
         public IActionResult Index()
@@ -54,7 +67,7 @@ namespace Bookify.Web.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(BookFormViewModel model)
+        public async Task<IActionResult> Create(BookFormViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -78,10 +91,26 @@ namespace Bookify.Web.Controllers
                 }
                 //save image in database and in application
                 var imageName = $"{Guid.NewGuid()}{extension}"; // change name of image in database and in wwwroot
-                var path = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books", imageName); //this save image in wwwroot/images/books ,, (_webHostEnvironment.WebRootPath) => get path until wwwroot
-                using var stream = System.IO.File.Create(path); // save that this Iformfile(image) in that path
-                model.Image.CopyTo(stream); // copy model.Image in stream that its role save it in path
-                book.ImageUrl = imageName;//this save image in database(ImageUrl)
+
+                #region Save image in local server, this deals with out resource (Operating System)
+
+                //var path = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books", imageName); //this save image in wwwroot/images/books ,, (_webHostEnvironment.WebRootPath) => get path until wwwroot
+                //using var stream = System.IO.File.Create(path); // save that this Iformfile(image) in that path
+                //await model.Image.CopyToAsync(stream); // copy model.Image in stream that its role save it in path
+                //book.ImageUrl = imageName;//this save image in database(ImageUrl)
+                #endregion
+                #region Save image in Cloudninary server instead of local server
+                using var stream = model.Image.OpenReadStream();// create stream for image
+                var imageParams = new ImageUploadParams
+                {
+                    File = new FileDescription(imageName, stream),
+                    UseFilename = true // make file name on cloudinary is the same name uploaded file(imageName )
+                };
+                var result = await _cloudinary.UploadAsync(imageParams);
+                book.ImageUrl = result.SecureUrl.ToString();
+                book.ImageThumbnailUrl = GetThumbnailUrl(book.ImageUrl);//thumbnail image with small size
+                book.ImagePublicId = result.PublicId;
+                #endregion
             }
 
             foreach (var item in model.SelectedCategoryIds)
@@ -110,13 +139,15 @@ namespace Bookify.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(BookFormViewModel model)
+        public async Task<IActionResult> Edit(BookFormViewModel model)
         {
             /*
              * Note, don't delete that
              * image on server means => image in path wwwroot
              * image on database means=> image in book.ImageUrl
              */
+            string imagePublicId = null;
+
             if (!ModelState.IsValid)
             {
                 var returnModel = PopulateViewModel(model);
@@ -135,12 +166,18 @@ namespace Bookify.Web.Controllers
                 // in case there is old image
                 if (!string.IsNullOrEmpty(book.ImageUrl)) //check if ImageUrl(in database) has value
                 {
-                    var oldImagePath = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books", book.ImageUrl); //on the server
-                    if(System.IO.File.Exists(oldImagePath))// is there file in that path ,if yes delete it 
-                    {
-                        System.IO.File.Delete(oldImagePath);
-                    }
-
+                    #region deal with local server
+                    //var oldImagePath = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books", book.ImageUrl); //on the server
+                    //if (System.IO.File.Exists(oldImagePath))// is there file in that path ,if yes delete it 
+                    //{
+                    //    System.IO.File.Delete(oldImagePath);
+                    //}
+                    #endregion
+                    #region Deal with cloudinary
+                    // Delete the old image from Cloudinary
+                    await _cloudinary.DeleteResourcesAsync(book.ImagePublicId);
+                   
+                    #endregion
                 }
                 // in case model.Image  is new image(there is not old image)
                 var extension = Path.GetExtension(model.Image.FileName);
@@ -154,24 +191,45 @@ namespace Bookify.Web.Controllers
                     ModelState.AddModelError(nameof(model.Image), Errors.MaxSize);
                     return View("Form", PopulateViewModel(model));
                 }
-                //save image in database and in application
+                //save image in database and in application(server)
                 var imageName = $"{Guid.NewGuid()}{extension}"; // change name of image in database and in wwwroot(on server)
-                var path = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books", imageName); //this save image in wwwroot/images/books ,, (_webHostEnvironment.WebRootPath) => get path until wwwroot
-                using var stream = System.IO.File.Create(path); // save that this Iformfile(image) in that path or create file in this path
-                model.Image.CopyTo(stream); // created file in that path put this data(model.Image) in it
-                model.ImageUrl = imageName;//this map in automapper && this save image in database
+
+                #region Save image in local server, this deals with out resource (Operating System)
+                //var path = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books", imageName); //this save image in wwwroot/images/books ,, (_webHostEnvironment.WebRootPath) => get path until wwwroot
+                //using var stream = System.IO.File.Create(path); // save that this Iformfile(image) in that path or create file in this path
+                //await model.Image.CopyToAsync(stream); // created file in that path put this data(model.Image) in it
+                //model.ImageUrl = imageName;//this map in automapper && this save image in database
+
+                #endregion
+
+                #region Save image in Cloudninary server instead of local server
+                // Save image in Cloudinary server
+                using var stream = model.Image.OpenReadStream();// create stream for image
+                var imageParams = new ImageUploadParams
+                {
+                    File = new FileDescription(imageName, stream),
+                    UseFilename = true // make file name on cloudinary is the same name uploaded file(imageName )
+                };
+                var result = await _cloudinary.UploadAsync(imageParams);
+                book.ImageUrl = result.SecureUrl.ToString();
+                book.ImageThumbnailUrl = GetThumbnailUrl(book.ImageUrl);//thumbnail image with small size
+                model.ImageUrl = result.SecureUrl.ToString();
+                imagePublicId = result.PublicId;
+                #endregion
+
+
             }
             //in case model.Image is null
-            else if(model.Image is null & !string.IsNullOrEmpty(book.ImageUrl) )
+            else if (!string.IsNullOrEmpty(book.ImageUrl))//model.Image is null & 
             {
-                model.ImageUrl=book.ImageUrl;
+                model.ImageUrl = book.ImageUrl;
             }
-           
 
-            book = _mapper.Map(model, book);
+
+            book = _mapper.Map(model, book); // model not contain ImageThumbnailUrl
             book.LastUpdatedOn = DateTime.Now;
-
-            foreach (var item in model.SelectedCategoryIds)   
+            book.ImagePublicId = imagePublicId; //cloudinary
+            foreach (var item in model.SelectedCategoryIds)
             { //fill BookCategory table
                 // here in foreach ordering wiht automapper is must هنا الترتيب لازم وعدم الترتيب يحدث مشكلة
                 book.Categories.Add(new BookCategory { CategoryId = item });
@@ -183,7 +241,7 @@ namespace Bookify.Web.Controllers
 
         public IActionResult AllowBook(BookFormViewModel model)
         {
-            var book = _context.Books.SingleOrDefault(b=> b.Title == model.Title && b.AuthorId == model.AuthorId);
+            var book = _context.Books.SingleOrDefault(b => b.Title == model.Title && b.AuthorId == model.AuthorId);
             var isAllowed = book is null || book.Id.Equals(model.Id);
 
             return Json(isAllowed);
@@ -203,5 +261,44 @@ namespace Bookify.Web.Controllers
             viewModel.Categories = _mapper.Map<IEnumerable<SelectListItem>>(categories);
             return viewModel;
         }
+        private string GetThumbnailUrl(string Url)
+        {
+            var separator = "image/upload/";
+            var UrlParts = Url.Split(separator);
+            var thumbnailUrl = $"{UrlParts[0]}{separator}c_thumb,w_200,g_face/{UrlParts[1]}";
+            return thumbnailUrl;
+            #region more Details
+            //https://res.cloudinary.com/bookifyabc/image/upload/v1702743649/npucw6wdntg1beeqohin.jpg
+            //https://res.cloudinary.com/bookifyabc/image/upload/c_thumb,w_200,g_face/v1702743649/npucw6wdntg1beeqohin.jpg
+            //after split
+            //UrlParts[0] = https://res.cloudinary.com/bookifyabc/
+            //UrlParts[1] = c_thumb,w_200,g_face/v1702743649/npucw6wdntg1beeqohin.jpg
+            // (image/upload/) => this separator is deleted
+            //(c_thumb,w_200,g_face/) => this is difference between orignal image and thumbnail image
+            #endregion
+        }
+        private string GetPublicId(string imageUrl)
+        {
+            var separator = "image/upload/";
+            var urlParts = imageUrl.Split(separator);
+            if (urlParts.Length > 1)
+            {
+                var publicIdWithExtension = urlParts[1].Split("/")[1];
+                return publicIdWithExtension.Split(".")[0];
+            }
+            return string.Empty;
+        }
     }
+
 }
+
+
+
+
+
+
+
+
+
+
+

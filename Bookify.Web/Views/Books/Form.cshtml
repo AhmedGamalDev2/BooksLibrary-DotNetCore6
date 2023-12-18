@@ -41,7 +41,11 @@
             <!--begin::Image input-->
             <div class="row">
                 <div class="col-md-4">
-                    <div class="image-input image-input-empty mb-10" data-kt-image-input="true" style="background-image: url(/images/@(string.IsNullOrEmpty(Model?.ImageUrl) ? "imageNotAvailable.png" : $"/books/{Model.ImageUrl}"))">
+                    @* in case dealing with local server *@
+                    @*<div class="image-input image-input-empty mb-10" data-kt-image-input="true" style="background-image: url(/images/@(string.IsNullOrEmpty(Model?.ImageUrl) ? "imageNotAvailable.png" : $"/books/{Model.ImageUrl}"))">*@
+                    @* in case dealing with cloudinary *@
+                    <div class="image-input image-input-empty mb-10" data-kt-image-input="true" style="background-image: url(@(string.IsNullOrEmpty(Model?.ImageUrl)? "/images/imageNotAvailable.png" : $"{Model.ImageUrl}"))">
+                        
                         <!--begin::Image preview wrapper-->
                         <div class="image-input-wrapper w-350px h-300px"></div>
                         <!--end::Image preview wrapper-->
@@ -52,7 +56,7 @@
                             <i class="bi bi-pencil-fill fs-7"></i>
 
                             <!--begin::Inputs-->
-                            <input type="file" asp-for="Image" accept=".png, .jpg, .jpeg" />
+                            <input type="file" asp-for="Image" accept=".png, .jpg, .jpeg"  />
                             <input type="hidden" name="avatar_remove" />
                             <!--end::Inputs-->
                         </label>
