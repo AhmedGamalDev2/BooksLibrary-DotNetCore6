@@ -134,17 +134,37 @@ var KTDatatables = function () {
     };
 }();
 
+ 
+function disableSubmitButton() { //f16
+    $('body :submit').attr('disabled', 'disabled').attr('data-kt-indicator', 'on');
+}
 
 $(document).ready(function () {
+    //Disable submit button //f16
+    $('form').on('submit', function () {
+        if ($('.js-tinymce').length > 0) {
+            $('.js-tinymce').each(function () {
+                var input = $(this);
+
+                var content = tinyMCE.get(input.attr('id')).getContent();
+                input.val(content);
+            });
+        }
+
+        var isValid = $(this).valid();
+        if (isValid) disableSubmitButton();
+    });
     //tinymce textarea
-    var options = { selector: ".js-tinymce", height: "422" };
+    if ($('.js-tinymce').length> 0) { // (if)(this means if there page (index or form ) has element that has class with .js-tinymce) => because tinymce('.js-tinymce') not existed(give error) in index page , but only existed in form pages
+        var options = { selector: ".js-tinymce", height: "440" };
 
-    if (KTThemeMode.getMode() === "dark") {
-        options["skin"] = "oxide-dark";
-        options["content_css"] = "dark";
+        if (KTThemeMode.getMode() === "dark") {
+            options["skin"] = "oxide-dark";
+            options["content_css"] = "dark";
+        }
+
+        tinymce.init(options);
     }
-
-    tinymce.init(options);
     //datepicker
     $('.js-datepicker').daterangepicker({
         singleDatePicker: true,
@@ -156,6 +176,12 @@ $(document).ready(function () {
 
     //Select2
     $('.js-select2').select2();
+    $('.js-select2').on('select2:select', function (e) { //f16
+        var select = $(this);
+        $('form').validate().element('#' + select.attr('id'));
+        console.log("hello select");
+        console.log(select)
+    });
 
     /**start datatable*/
     //$('table').DataTable();

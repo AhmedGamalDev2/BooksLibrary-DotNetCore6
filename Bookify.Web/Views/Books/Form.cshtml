@@ -4,10 +4,10 @@
     ViewData["Title"] = $"{(Model?.Id > 0 ? "Edit" : "Add")} Book";
 }
 
-<div class="card shadow-sm">
+<div class="card shadow-sm mb-11">
     <div class="card-header">
         <div class="card-title h3">
-            <div class="symbol symbol-40px me-4">
+            @*<div class="symbol symbol-40px me-4">
                 <div class="symbol-label fs-2 fw-semibold text-success">
                     <!--begin::Svg Icon | path: icons/duotune/general/gen002.svg-->
                     <span class="svg-icon svg-icon-2 svg-icon-primary">
@@ -15,12 +15,12 @@
                     </span>
                     <!--end::Svg Icon-->
                 </div>
-            </div>
+            </div>*@
             @(Model?.Id > 0 ? "Edit" : "Add") Book
         </div>
     </div>
     <div class="card-body">
-        <form method="post" asp-controller="Books" enctype="multipart/form-data">
+        <form method="post" asp-controller="Books" enctype="multipart/form-data" id="FormForFooter">
             <!-- enctype="multipart/form-data" => this for upload file(like image) with form -->
             @*Id*@
             @if (Model?.Id > 0)
@@ -39,47 +39,50 @@
                 }
             </style>
             <!--begin::Image input-->
-            <div class="row">
-                <div class="col-md-4">
-                    @* in case dealing with local server *@
-                    @*<div class="image-input image-input-empty mb-10" data-kt-image-input="true" style="background-image: url(/images/@(string.IsNullOrEmpty(Model?.ImageUrl) ? "imageNotAvailable.png" : $"/books/{Model.ImageUrl}"))">*@
-                    @* in case dealing with cloudinary *@
-                    <div class="image-input image-input-empty mb-10" data-kt-image-input="true" style="background-image: url(@(string.IsNullOrEmpty(Model?.ImageUrl)? "/images/imageNotAvailable.png" : $"{Model.ImageUrl}"))">
-                        
-                        <!--begin::Image preview wrapper-->
-                        <div class="image-input-wrapper w-350px h-300px"></div>
-                        <!--end::Image preview wrapper-->
-                        <!--begin::Edit button-->
-                        <label class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
-                               data-kt-image-input-action="change"
-                               data-bs-dismiss="click">
-                            <i class="bi bi-pencil-fill fs-7"></i>
+            <div class="mb-10">
+                <div class="row">
+                    <div class="col-md-4">
+                        @* in case dealing with local server *@
+                        @*<div class="image-input image-input-empty mb-10" data-kt-image-input="true" style="background-image: url(/images/@(string.IsNullOrEmpty(Model?.ImageUrl) ? "imageNotAvailable.png" : $"/books/{Model.ImageUrl}"))">*@
+                        @* in case dealing with cloudinary *@
+                        <div class="image-input image-input-empty" data-kt-image-input="true" style="background-image: url(@(string.IsNullOrEmpty(Model?.ImageUrl)? "/images/imageNotAvailable.png" : $"{Model.ImageThumbnailUrl}"))">
+                           
+                            <!--begin::Image preview wrapper-->
+                            <div class="image-input-wrapper w-350px h-300px"></div>
+                            <!--end::Image preview wrapper-->
+                            <!--begin::Edit button-->
+                            <label class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
+                                   data-kt-image-input-action="change"
+                                   data-bs-dismiss="click" >
+                                <i class="bi bi-pencil-fill fs-7"></i>
 
-                            <!--begin::Inputs-->
-                            <input type="file" asp-for="Image" accept=".png, .jpg, .jpeg"  />
-                            <input type="hidden" name="avatar_remove" />
-                            <!--end::Inputs-->
-                        </label>
-                        <!--end::Edit button-->
-                        <!--begin::Cancel button-->
-                        <span class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
-                              data-kt-image-input-action="cancel"
-                              data-bs-dismiss="click">
-                            <i class="bi bi-x fs-2"></i>
-                        </span>
-                        <!--end::Cancel button-->
-                        <!--begin::Remove button-->
-                        <span class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
-                              data-kt-image-input-action="remove"
-                              data-bs-dismiss="click">
-                            <i class="bi bi-x fs-2"></i>
-                        </span>
-                        <!--end::Remove button-->
+                                <!--begin::Inputs-->
+                                <input type="file" asp-for="Image" accept=".png, .jpg, .jpeg" />
+                                <input type="hidden" name="avatar_remove" />
+                                <!--end::Inputs-->
+                            </label>
+                            <!--end::Edit button-->
+                            <!--begin::Cancel button-->
+                            <span class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
+                                  data-kt-image-input-action="cancel"
+                                  data-bs-dismiss="click">
+                                <i class="bi bi-x fs-2"></i>
+                            </span>
+                            <!--end::Cancel button-->
+                            <!--begin::Remove button-->
+                            <span class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
+                                  data-kt-image-input-action="remove"
+                                  data-bs-dismiss="click">
+                                <i class="bi bi-x fs-2"></i>
+                            </span>
+                            <!--end::Remove button-->
+                        </div>
+                        <div class="form-text"> Allowed file types: png, jpg, jpeg and cannot be more than 2MB</div>
+                        <span asp-validation-for="Image" class="text-danger d-block"></span>
                     </div>
-                    <span asp-validation-for="Image" class="text-danger d-block"></span>
                 </div>
-            </div>
 
+              </div>
             <!--end::Image input-->
             <div class="row">
                 @*left side*@
@@ -89,7 +92,7 @@
                         <div class="col">
                             <div class="mb-5">
                                 <div class="form-floating mb-2">
-                                    <input type="text" class="form-control" placeholder="Title" asp-for="Title" />
+                                    <input type="text" class="form-control form-control-solid form-control form-control-solid-solid" placeholder="Title" asp-for="Title" />
                                     <label asp-for="Title"></label>
                                 </div>
                                 <span asp-validation-for="Title" class="text-danger d-block"></span>
@@ -101,7 +104,7 @@
                         <div class="col">
                             <div class="mb-5">
                                 <div class="form-floating mb-2">
-                                    <select class="form-select js-select2" data-placeholder="Select an author" asp-for="AuthorId" asp-items="@Model?.Authors">
+                                    <select class="form-select form-select-solid js-select2" data-placeholder="Select an author" asp-for="AuthorId" asp-items="@Model?.Authors">
                                         <option value=""> Select an author </option>
                                     </select>
                                     <label asp-for="AuthorId"></label>
@@ -115,8 +118,8 @@
                         <div class="col">
                             <div class="mb-5">
                                 <div class="mb-2">
-                                    <select class="form-select js-select2" data-placeholder="Select categories" asp-for="SelectedCategoryIds" asp-items="@Model?.Categories">
-                                        <option value=""> Select Categories </option>
+                                    <select class="form-select form-select-solid js-select2" data-placeholder="Select categories" asp-for="SelectedCategoryIds" asp-items="@Model?.Categories">
+                                      
                                     </select>
                                     <label asp-for="SelectedCategoryIds"></label>
                                 </div>
@@ -129,7 +132,7 @@
                         <div class="col">
                             <div class="mb-5">
                                 <div class="form-floating mb-2">
-                                    <input type="text" class="form-control" placeholder="Publisher" asp-for="Publisher" />
+                                    <input type="text" class="form-control form-control-solid" placeholder="Publisher" asp-for="Publisher" />
                                     <label asp-for="Publisher"></label>
                                 </div>
                                 <span asp-validation-for="Publisher" class="text-danger"></span>
@@ -141,7 +144,7 @@
                         <div class="col">
                             <div class="mb-5">
                                 <div class="form-floating mb-2">
-                                    <input type="text" class="form-control js-datepicker" placeholder="Publishing Date" asp-for="PublishingDate" />
+                                    <input type="text" class="form-control form-control-solid js-datepicker" placeholder="Publishing Date" asp-for="PublishingDate" />
                                     <label asp-for="PublishingDate"></label>
                                 </div>
                                 <span asp-validation-for="PublishingDate" class="text-danger"></span>
@@ -156,7 +159,7 @@
                     <img style="height:250px ;width:200px" id="ImagePreview" src="~/images/books/@(Model?.ImageUrl is null ? "imageNotAvailable.png":Model.ImageUrl )" class="img-thumbnail" alt="Book Image">
                     </div>
                     <div class="form-floating mb-2">
-                    <input type="file" class="form-control" asp-for="Image"  value="aaaaaaaa"
+                    <input type="file" class="form-control form-control-solid" asp-for="Image"  value="aaaaaaaa"
                     onchange="document.getElementById('ImagePreview').src=window.URL.createObjectURL(this.files[0])" />
                     <label asp-for="Image"></label>
                     </div>
@@ -168,7 +171,7 @@
                     <div class="row">
                         <div class="col">
                             <div class="mb-5">
-                                <div class="form-check form-switch">
+                                <div class="form-check form-switch  form-check-custom">
                                     <input class="form-check-input" type="checkbox" asp-for="IsAvailableForRental">
                                     <label class="form-check-label" asp-for="IsAvailableForRental"> Is Available For Rental  </label>
                                 </div>
@@ -181,7 +184,7 @@
                         <div class="col">
                             <div class="mb-5">
                                 <div class="form-floating mb-2">
-                                    <input type="text" class="form-control" placeholder="Hall" asp-for="Hall" />
+                                    <input type="text" class="form-control form-control-solid" placeholder="Hall" asp-for="Hall" />
                                     <label asp-for="Hall"></label>
                                 </div>
                                 <span asp-validation-for="Hall" class="text-danger"></span>
@@ -196,24 +199,26 @@
                     <div class="row">
                         <div class="col">
                             <div class="mb-5">
-                                <label asp-for="Description" class="form-label"></label>
-                                <textarea class="form-control js-tinymce" asp-for="Description" rows="3" placeholder="Description"></textarea>
+                                @*<label asp-for="Description" class="form-label"></label>*@
+                                <textarea class="form-control form-control-solid js-tinymce" asp-for="Description" rows="3" placeholder="Description" ></textarea>
                             </div>
                             <span asp-validation-for="Description" class="text-danger d-block"></span>
 
                         </div>
                     </div>
                 </div>
-            </div>
-
-
-
-            <button type="submit" class="btn btn-primary btn-sm">
-                <i class="bi bi-check2"></i>
-                Save
-            </button>
+            </div> 
+           
         </form>
 
+    </div>
+    <div class="card-footer mb-5">
+
+        <button type="submit" class="btn btn-primary btn-sm " form="FormForFooter">
+            <i class="bi bi-check2"></i>
+            Save
+        </button>
+        <a class="btn btn-light text-primary ms-3" asp-action="Index">Cancel</a>
     </div>
 </div>
 
