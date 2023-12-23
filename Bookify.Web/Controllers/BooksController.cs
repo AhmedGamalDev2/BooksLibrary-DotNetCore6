@@ -14,7 +14,7 @@ namespace Bookify.Web.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IMapper _mapper;
         private readonly Cloudinary _cloudinary;
-        private List<string> _allowedExtensions = new() { ".jpg", ".jpeg", ".png" };
+        private List<string> _allowedExtensions = new() { ".jpg", ".jpeg", ".png", ".webp" };
         private int _maxAllowedSize = 2097152;
 
         public BooksController(ApplicationDbContext context, IMapper mapper, IWebHostEnvironment webHostEnvironment, IOptions<CloudinarySettings> cloudinary)
@@ -35,6 +35,23 @@ namespace Bookify.Web.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+        public IActionResult Details(int id)
+        {
+            var book = _context.Books
+                .Include(book => book.Author)
+                .Include(b=>b.Categories)
+                .ThenInclude(s=>s.Category) // this Category that is inside BookCategory (ThenInclude is very usefull)
+                .SingleOrDefault(b => b.Id == id );
+           
+            if(book is null)
+            {
+                return NotFound();
+            }
+            //mapping
+            var viewModel = _mapper.Map<BookViewModel>(book);//source:book,destination:BookViewModel
+            return View(viewModel);
         }
 
         public IActionResult Create()
@@ -134,7 +151,7 @@ namespace Bookify.Web.Controllers
 
             _context.Books.Add(book);
             _context.SaveChanges();
-            return View(nameof(Index));
+            return RedirectToAction(nameof(Details),new {id= book.Id});// here(id field) must equal and be the same Details parameter(int id)
         }
 
         public IActionResult Edit(int id)
@@ -256,6 +273,7 @@ namespace Bookify.Web.Controllers
             else if (!string.IsNullOrEmpty(book.ImageUrl))//model.Image is null & 
             {
                 model.ImageUrl = book.ImageUrl;
+                model.ImageThumbnailUrl = book.ImageThumbnailUrl; //by save thumbnail  image
             }
             book = _mapper.Map(model, book); 
             book.LastUpdatedOn = DateTime.Now;
@@ -266,7 +284,7 @@ namespace Bookify.Web.Controllers
                 book.Categories.Add(new BookCategory { CategoryId = item });
             }
             _context.SaveChanges();
-            return View(nameof(Index));
+            return RedirectToAction(nameof(Details),new {id=book.Id}); // here(id field) must equal and be the same Details parameter(int id)
         }
 
 

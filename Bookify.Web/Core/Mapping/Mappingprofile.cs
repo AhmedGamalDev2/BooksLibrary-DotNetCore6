@@ -23,7 +23,7 @@ namespace Bookify.Web.Core.Mapping
 
            
             //Author
-            CreateMap<Author, AuthorViewModel>();
+            CreateMap<Author, AuthorViewModel>(); //source:Author, destination:AuthorViewModel
             CreateMap<AuthorFormViewModel, Author>().ReverseMap();
 
             CreateMap<Author, SelectListItem>()
@@ -35,6 +35,9 @@ namespace Bookify.Web.Core.Mapping
                 .ReverseMap()
                 .ForMember(dest=>dest.Categories,opt=>opt.Ignore()); //this is because there are two the same name with (Categories) in Category and CategoryFormViewModel with different type
 
+            CreateMap<Book, BookViewModel>()
+              .ForMember(destBookViewModel => destBookViewModel.Author, options => options.MapFrom(sourceBook => sourceBook.Author!.Name))
+              .ForMember(destBookViewModel => destBookViewModel.Categories, options => options.MapFrom(sourceBook => sourceBook.Categories.Select(category => category.Category!.Name)));
         }
     }
 }
