@@ -20,6 +20,19 @@ body {
 /* start override on theme .. author form**/
 
 .form-floating > .form-select {
-    
     padding-bottom: 0.225rem;
+}
     /*end override on theme .. author form**/
+
+/* Start Custom Styles */
+
+.dt-spinner + div {
+    display: none !important;
+}
+
+.h-70px {
+    height: 70px !important;
+}
+
+/* End Custom Styles */
+
