@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Bookify.Web.Controllers
 {
     public class BookCopiesController : Controller
-    {
+    { 
+       //copies 
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
 
