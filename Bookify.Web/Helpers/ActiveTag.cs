@@ -20,7 +20,7 @@ namespace Bookify.Web.Helpers
             if(string.IsNullOrEmpty(ActiveWhen))
                 return;
 
-            var currentController = ViewContextData?.RouteData.Values["controller"]?.ToString();
+            var currentController = ViewContextData?.RouteData.Values["controller"]?.ToString() ?? string.Empty; // ?? string.Empty => this for identity
 
             if (currentController!.Equals(ActiveWhen))
             {   //in case the element(like anchor tag) contains class attribute

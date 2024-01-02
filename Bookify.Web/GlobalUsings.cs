@@ -6,5 +6,7 @@ global using Bookify.Web.Core.ViewModels;
 global using Microsoft.EntityFrameworkCore;
 global using Bookify.Web.Core.Consts;
 global using AutoMapper;
+global using Microsoft.AspNetCore.Identity;
+
 
 

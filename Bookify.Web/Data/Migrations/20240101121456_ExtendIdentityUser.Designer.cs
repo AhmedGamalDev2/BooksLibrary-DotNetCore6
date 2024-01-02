@@ -4,6 +4,7 @@ using Bookify.Web.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bookify.Web.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240101121456_ExtendIdentityUser")]
+    partial class ExtendIdentityUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,9 +39,6 @@ namespace Bookify.Web.Data.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CreatedById")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
@@ -57,9 +56,6 @@ namespace Bookify.Web.Data.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<string>("LastUpdatedById")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("LastUpdatedOn")
                         .HasColumnType("datetime2");
@@ -118,17 +114,11 @@ namespace Bookify.Web.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("CreatedById")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<string>("LastUpdatedById")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("LastUpdatedOn")
                         .HasColumnType("datetime2");
@@ -140,14 +130,10 @@ namespace Bookify.Web.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("LastUpdatedById");
-
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Authors", (string)null);
+                    b.ToTable("Authors");
                 });
 
             modelBuilder.Entity("Bookify.Web.Core.Models.Book", b =>
@@ -160,9 +146,6 @@ namespace Bookify.Web.Data.Migrations
 
                     b.Property<int>("AuthorId")
                         .HasColumnType("int");
-
-                    b.Property<string>("CreatedById")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
@@ -191,9 +174,6 @@ namespace Bookify.Web.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("LastUpdatedById")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime?>("LastUpdatedOn")
                         .HasColumnType("datetime2");
 
@@ -214,14 +194,10 @@ namespace Bookify.Web.Data.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("LastUpdatedById");
-
                     b.HasIndex("Title", "AuthorId")
                         .IsUnique();
 
-                    b.ToTable("Books", (string)null);
+                    b.ToTable("Books");
                 });
 
             modelBuilder.Entity("Bookify.Web.Core.Models.BookCategory", b =>
@@ -236,7 +212,7 @@ namespace Bookify.Web.Data.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("BookCategories", (string)null);
+                    b.ToTable("BookCategories");
                 });
 
             modelBuilder.Entity("Bookify.Web.Core.Models.BookCopy", b =>
@@ -250,9 +226,6 @@ namespace Bookify.Web.Data.Migrations
                     b.Property<int>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CreatedById")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
@@ -264,9 +237,6 @@ namespace Bookify.Web.Data.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<string>("LastUpdatedById")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("LastUpdatedOn")
                         .HasColumnType("datetime2");
@@ -280,11 +250,7 @@ namespace Bookify.Web.Data.Migrations
 
                     b.HasIndex("BookId");
 
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("LastUpdatedById");
-
-                    b.ToTable("BookCopies", (string)null);
+                    b.ToTable("BookCopies");
                 });
 
             modelBuilder.Entity("Bookify.Web.Core.Models.Category", b =>
@@ -295,17 +261,11 @@ namespace Bookify.Web.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("CreatedById")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<string>("LastUpdatedById")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("LastUpdatedOn")
                         .HasColumnType("datetime2");
@@ -317,14 +277,10 @@ namespace Bookify.Web.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("LastUpdatedById");
-
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -351,7 +307,7 @@ namespace Bookify.Web.Data.Migrations
                         .HasDatabaseName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
-                    b.ToTable("Roles", "Security");
+                    b.ToTable("AspNetRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -376,59 +332,7 @@ namespace Bookify.Web.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("RoleClaims", "Security");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Users", "Security");
+                    b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -453,7 +357,7 @@ namespace Bookify.Web.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserClaims", "Security");
+                    b.ToTable("AspNetUserClaims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -477,7 +381,7 @@ namespace Bookify.Web.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserLogins", "Security");
+                    b.ToTable("AspNetUserLogins", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
@@ -492,7 +396,7 @@ namespace Bookify.Web.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRoles", "Security");
+                    b.ToTable("AspNetUserRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -513,22 +417,7 @@ namespace Bookify.Web.Data.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("UserTokens", "Security");
-                });
-
-            modelBuilder.Entity("Bookify.Web.Core.Models.Author", b =>
-                {
-                    b.HasOne("Bookify.Web.Core.Models.ApplicationUser", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById");
-
-                    b.HasOne("Bookify.Web.Core.Models.ApplicationUser", "LastUpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("LastUpdatedById");
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("LastUpdatedBy");
+                    b.ToTable("AspNetUserTokens", (string)null);
                 });
 
             modelBuilder.Entity("Bookify.Web.Core.Models.Book", b =>
@@ -539,19 +428,7 @@ namespace Bookify.Web.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Bookify.Web.Core.Models.ApplicationUser", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById");
-
-                    b.HasOne("Bookify.Web.Core.Models.ApplicationUser", "LastUpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("LastUpdatedById");
-
                     b.Navigation("Author");
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("LastUpdatedBy");
                 });
 
             modelBuilder.Entity("Bookify.Web.Core.Models.BookCategory", b =>
@@ -581,34 +458,7 @@ namespace Bookify.Web.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Bookify.Web.Core.Models.ApplicationUser", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById");
-
-                    b.HasOne("Bookify.Web.Core.Models.ApplicationUser", "LastUpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("LastUpdatedById");
-
                     b.Navigation("Book");
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("LastUpdatedBy");
-                });
-
-            modelBuilder.Entity("Bookify.Web.Core.Models.Category", b =>
-                {
-                    b.HasOne("Bookify.Web.Core.Models.ApplicationUser", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById");
-
-                    b.HasOne("Bookify.Web.Core.Models.ApplicationUser", "LastUpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("LastUpdatedById");
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("LastUpdatedBy");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
