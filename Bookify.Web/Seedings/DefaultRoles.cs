@@ -4,7 +4,7 @@ namespace Bookify.Web.Seeds
 {
     public static class DefaultRoles
     {
-        public static async Task SeedAsync(RoleManager<IdentityRole> roleManager)
+        public static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
         {
             if (!roleManager.Roles.Any())
             {
@@ -12,6 +12,8 @@ namespace Bookify.Web.Seeds
                 await roleManager.CreateAsync(new IdentityRole(AppRoles.Archive));
                 await roleManager.CreateAsync(new IdentityRole(AppRoles.Reception));
             }
-        } 
+        }
+
+         
     }
 }
