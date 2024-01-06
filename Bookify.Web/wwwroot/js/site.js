@@ -191,7 +191,7 @@ function disableSubmitButton() { //f16
 
 $(document).ready(function () {
     //Disable submit button //f16
-    $('form').on('submit', function () {
+    $('form').not("#SignOut").on('submit', function () { //not("#SignOut") => here, this form (with id="#SignOut") don,t have validation files ,,,,   لان دا يستدعي ان انا اضع فيلات الفاليديشن في صفحة اللييه أوت واحنا مش عايزين نضعها في صفحة اللييه أوت علشان حجمها كبير (layout page)  
         if ($('.js-tinymce').length > 0) {
             $('.js-tinymce').each(function () {
                 var input = $(this);
@@ -201,7 +201,9 @@ $(document).ready(function () {
             });
         }
 
-        var isValid = $(this).valid();
+        //هل الصفحة اللي واقف فيها دلوقت (اي صفحة اروح ليها ) موجود فيها فيلات الفاليديشن
+        var isValid = $(this).valid(); // this function (valid()) needs validation files  =>//not("#SignOut") => here, this form (with id="#SignOut") don,t have validation files ,,,,   لان دا يستدعي ان انا اضع فيلات الفاليديشن في صفحة اللييه أوت واحنا مش عايزين نضعها في صفحة اللييه أوت علشان حجمها كبير (layout page)  
+         
         if (isValid) disableSubmitButton();
     });
     //tinymce textarea
@@ -315,5 +317,9 @@ $(document).ready(function () {
         });
     });
 
+    //Handle SignOut
+    $('.js-SignOut').on("click", function () {
+        $('#SignOut').submit();
+    })
  
 })

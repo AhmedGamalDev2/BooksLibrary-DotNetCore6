@@ -1,0 +1,121 @@
+﻿@model IEnumerable<UserViewModel>
+
+@{
+    ViewData["Title"] = "Users";
+}
+@section Styles{
+    <link href="~/assets/plugins/datatables/datatables.bundle.css" rel="stylesheet" />
+}
+
+<div class="card shadow-sm">
+    @*start: datatable header card *@
+    <partial name="_DatatablesCardHeader">
+
+        @*end :: datatable header card *@
+        @********second header card  ************@
+        <div class="card-header">
+            <div class="card-title h3">
+                <div class="symbol symbol-40px me-4">
+                    <div class="symbol-label fs-2 fw-semibold text-success">
+                        <!--begin::Svg Icon | path: icons/duotune/general/gen002.svg-->
+                        <span class="svg-icon svg-icon-2 svg-icon-primary">
+                            <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo8/dist/../src/media/svg/icons/General/User.svg-->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people-fill" viewBox="0 0 16 16">
+                                <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5" />
+                            </svg>
+                            <!--end::Svg Icon-->
+                        </span>
+                        <!--end::Svg Icon-->
+                    </div>
+                </div>
+                Users
+            </div>
+            <div class="card-toolbar">
+                <a asp-controller="Users" asp-action="Create" class="btn btn-sm btn-primary">
+                    <i class="bi bi-plus-square-dotted"></i>
+                    Add
+                </a>
+            </div>
+        </div>
+
+        <div class="card-body pt-0">
+            @if (!Model.Any())
+            {
+                <div class="alert alert-dismissible bg-light-warning border border-warning border-dashed d-flex flex-column flex-sm-row w-100 p-5 mb-10">
+                    <!--begin::Icon-->
+                    <!--begin::Svg Icon | path: icons/duotune/communication/com003.svg-->
+                    <span class="svg-icon svg-icon-2hx svg-icon-warning me-4 mb-5 mb-sm-0">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect opacity="0.3" x="2" y="2" width="20" height="20" rx="10" fill="currentColor" />
+                            <rect x="11" y="14" width="7" height="2" rx="1" transform="rotate(-90 11 14)" fill="currentColor" />
+                            <rect x="11" y="17" width="2" height="2" rx="1" transform="rotate(-90 11 17)" fill="currentColor" />
+                        </svg>
+                    </span>
+                    <!--end::Svg Icon-->
+                    <!--end::Icon-->
+                    <!--begin::Content-->
+                    <div class="d-flex flex-column pe-0 pe-sm-10 align-self-center">
+                        <h5 class="mb-1">No Users found!</h5>
+                    </div>
+                    <!--end::Content-->
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-row-dashed table-row-gray-300 gy-7 js-datatables" data-datatable-title="Category export">
+                        <thead>
+                            <tr class="fw-bold fs-6 text-gray-800">
+                                <th>FullName</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Created On</th>
+                                <th>Last Updated On</th>
+                                <th class="js-no-export">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in Model)
+                            {
+                                @*<partial name="_UseryRow" model="@user" />*@
+
+                                 <tr>
+                        <td>@user.FullName</td>
+                        <td>@user.UserName</td>
+                        <td>@user.Email</td>
+                        <td>
+                        <span class=" badge badge-light-@(user.IsDeleted ? "danger" : "success") jsStatus">
+                        @(user.IsDeleted ? "Deleted" : "Available")
+                        </span>
+                        </td>
+                        <td>@user.CreatedOn</td>
+                        <td class="js-updated-on">@user.LastUpdatedOn</td>
+                        <td>
+                        <div class="dropdown ">
+                        <button class="btn btn-secondary dropdown-toggle show" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="true">
+                        Action
+                        </button>
+
+                        <ul class="dropdown-menu  " aria-labelledby="dropdownMenuButton1" style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(0px, 39px);" data-popper-placement="bottom-start">
+                        <li><a class="dropdown-item" asp-controller="Categories" asp-action="Edit" asp-route-id="@user.Id">Edit</a></li>
+                        <li><a class="dropdown-item js-toggle-status" data-id="@user.Id" href="javascript:;">Toggle Status</a></li>
+                        </ul>
+                        </div>
+                        </td>
+                        </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+</div>
+@section Plugins{
+    <script src="~/assets/plugins/datatables/datatables.bundle.js"></script>
+}
+@Html.AntiForgeryToken();
+
+@section Scripts{
+    <script src="~/js/categories.js" asp-append-version="true"></script> @*f11-v1*@
+}

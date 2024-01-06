@@ -2,6 +2,7 @@
 
 namespace Bookify.Web.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -10,12 +11,12 @@ namespace Bookify.Web.Controllers
         {
             _logger = logger;
         }
-
+        //[AllowAnonymous]
         public IActionResult Index()
         {
             return View();
         }
-
+      
         public IActionResult Privacy()
         {
             return View();
