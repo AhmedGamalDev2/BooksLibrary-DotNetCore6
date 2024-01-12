@@ -1,6 +1,7 @@
 ﻿using Bookify.Web.Core.Consts;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.FileProviders;
+using System.Text.RegularExpressions;
 using UoN.ExpressiveAnnotations.NetCore.Attributes;
 
 namespace Bookify.Web.Core.ViewModels
@@ -34,5 +35,7 @@ namespace Bookify.Web.Core.ViewModels
         [Display(Name ="Categories")]
         public IList<int> SelectedCategoryIds { get; set; }= new List<int>();
         public IEnumerable<SelectListItem>? Categories { get; set; } //// another way , may be  public IEnumerable<Category>? Categories { get; set; }
+
+
     }
 }

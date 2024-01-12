@@ -52,7 +52,7 @@ function showErrorMessage(message = 'Something went wrong!') {
     Swal.fire({
         icon: 'error',
         title: 'Oops...',
-        text: message,
+        text: message.responseText != undefined ? message.responseText:message,
         customClass: {
             confirmButton: "btn btn-primary"
         }
@@ -80,6 +80,20 @@ function onModalSuccess(row) {
     var newRow = $(row);
     datatable.row.add(newRow).draw();
 }
+//Select2
+function applySelect2() {
+    $('.js-select2').select2();
+    $('.js-select2').on('select2:select', function (e) { // here, we revalidate on select2 when select event
+        $('form').not('#SignOut').validate().element('#' + $(this).attr('id'));
+        
+    });
+    $('.js-select2').on('select2:unselect', function (e) {// here, we revalidate on select2 when unselect event
+        $('form').not('#SignOut').validate().element('#' + $(this).attr('id'));
+    });
+}
+
+ 
+
 //datatables
 var headers = $('th');
 $.each(headers, function (i) { // select columns that i need to not export
@@ -190,6 +204,10 @@ function disableSubmitButton() { //f16
 }
 
 $(document).ready(function () {
+
+     
+
+
     //Disable submit button //f16
     $('form').not("#SignOut").on('submit', function () { //not("#SignOut") => here, this form (with id="#SignOut") don,t have validation files ,,,,   لان دا يستدعي ان انا اضع فيلات الفاليديشن في صفحة اللييه أوت واحنا مش عايزين نضعها في صفحة اللييه أوت علشان حجمها كبير (layout page)  
         if ($('.js-tinymce').length > 0) {
@@ -226,15 +244,9 @@ $(document).ready(function () {
     })
 
 
-    //Select2
-    $('.js-select2').select2();
-    $('.js-select2').on('select2:select', function (e) { //f16
-        var select = $(this);
-        $('form').validate().element('#' + select.attr('id'));
-        //console.log("hello select");
-        //console.log(select)
-    });
-
+    //Select2 //repeated in js-render-modal
+    applySelect2();
+     
     /**start datatable*/
     //$('table').DataTable();
     KTUtil.onDOMContentLoaded(function () {
@@ -251,7 +263,7 @@ $(document).ready(function () {
     $('body').delegate('.js-render-modal', 'click', function () {
         var btn = $(this);
         var modal = $('#Modal');
-
+        //console.log(modal)
         modal.find('#ModalLabel').text(btn.data('title'));
 
         if (btn.data('update') !== undefined) {
@@ -260,11 +272,13 @@ $(document).ready(function () {
 
         $.get({
             url: btn.data('url'),
-             
+            
             success: function (form) {
-               
                 modal.find('.modal-body').html(form);
                 $.validator.unobtrusive.parse(modal);
+
+                //Select2  //(5) دي علشان تحل مشكلة ال select2 لما يبقى شكلها مش مظبط in UserForm
+                applySelect2();
             },
             error: function () {
                 showErrorMessage();
@@ -321,5 +335,6 @@ $(document).ready(function () {
     $('.js-SignOut').on("click", function () {
         $('#SignOut').submit();
     })
- 
+
+  
 })

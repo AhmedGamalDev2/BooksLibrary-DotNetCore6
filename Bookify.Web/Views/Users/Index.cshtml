@@ -30,8 +30,15 @@
                 </div>
                 Users
             </div>
+            @*  <div class="card-toolbar">
+            <a asp-controller="Users" asp-action="Create" class="btn btn-sm btn-primary">
+            <i class="bi bi-plus-square-dotted"></i>
+            Add
+            </a>
+            </div>*@
             <div class="card-toolbar">
-                <a asp-controller="Users" asp-action="Create" class="btn btn-sm btn-primary">
+                <a href="javascript:;" class="btn btn-sm btn-primary js-render-modal clickahmed"
+                   data-title="Add User" data-url="/Users/Create">
                     <i class="bi bi-plus-square-dotted"></i>
                     Add
                 </a>
@@ -78,32 +85,32 @@
                         <tbody>
                             @foreach (var user in Model)
                             {
-                                @*<partial name="_UseryRow" model="@user" />*@
+                                <partial name="_UserRow" model="@user" />
 
-                                 <tr>
-                        <td>@user.FullName</td>
-                        <td>@user.UserName</td>
-                        <td>@user.Email</td>
-                        <td>
-                        <span class=" badge badge-light-@(user.IsDeleted ? "danger" : "success") jsStatus">
-                        @(user.IsDeleted ? "Deleted" : "Available")
-                        </span>
-                        </td>
-                        <td>@user.CreatedOn</td>
-                        <td class="js-updated-on">@user.LastUpdatedOn</td>
-                        <td>
-                        <div class="dropdown ">
-                        <button class="btn btn-secondary dropdown-toggle show" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="true">
-                        Action
-                        </button>
+                                @* <tr> // inestead of (<partial name="_UserRow" model="@user" />)
+                                    <td>@user.FullName</td>
+                                    <td>@user.UserName</td>
+                                    <td>@user.Email</td>
+                                    <td>
+                                        <span class=" badge badge-light-@(user.IsDeleted ? "danger" : "success") jsStatus">
+                                            @(user.IsDeleted ? "Deleted" : "Available")
+                                        </span>
+                                    </td>
+                                    <td>@user.CreatedOn</td>
+                                    <td class="js-updated-on">@user.LastUpdatedOn</td>
+                                    <td>
+                                        <div class="dropdown ">
+                                            <button class="btn btn-secondary dropdown-toggle show" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="true">
+                                                Action
+                                            </button>
 
-                        <ul class="dropdown-menu  " aria-labelledby="dropdownMenuButton1" style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(0px, 39px);" data-popper-placement="bottom-start">
-                        <li><a class="dropdown-item" asp-controller="Categories" asp-action="Edit" asp-route-id="@user.Id">Edit</a></li>
-                        <li><a class="dropdown-item js-toggle-status" data-id="@user.Id" href="javascript:;">Toggle Status</a></li>
-                        </ul>
-                        </div>
-                        </td>
-                        </tr>
+                                            <ul class="dropdown-menu  " aria-labelledby="dropdownMenuButton1" style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(0px, 39px);" data-popper-placement="bottom-start">
+                                                <li><a class="dropdown-item" asp-controller="Users" asp-action="Edit" asp-route-id="@user.Id">Edit</a></li>
+                                                <li><a class="dropdown-item js-toggle-status" data-id="@user.Id" href="javascript:;">Toggle Status</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>*@
                             }
                         </tbody>
                     </table>
@@ -117,5 +124,9 @@
 @Html.AntiForgeryToken();
 
 @section Scripts{
-    <script src="~/js/categories.js" asp-append-version="true"></script> @*f11-v1*@
+    <partial name="_ValidationScriptsPartial" /> @*(1)*@
+    <script src="~/js/user.js" asp-append-version="true"></script>@*f22-v1*@
+    @*<script src="~/js/categories.js" asp-append-version="true"></script> @*f11-v1*@
 }
+
+ 

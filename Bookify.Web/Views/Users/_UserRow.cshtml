@@ -4,13 +4,9 @@
     <td>@Model.FullName</td>
     <td>@Model.UserName</td>
     <td>@Model.Email</td>
-    <td>
-        <span class=" badge badge-light-@(Model.IsDeleted ? "danger" : "success") jsStatus">
-            @(Model.IsDeleted ? "Deleted" : "Available")
-        </span>
-    </td>
+    <td>@Model.IsDeleted</td>
     <td>@Model.CreatedOn</td>
-    <td class="js-updated-on">@Model.LastUpdatedOn</td>
+    <td>@Model.LastUpdatedOn</td>
     <td>
         <div class="dropdown ">
             <button class="btn btn-secondary dropdown-toggle show" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="true">
@@ -18,7 +14,7 @@
             </button>
 
             <ul class="dropdown-menu  " aria-labelledby="dropdownMenuButton1" style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(0px, 39px);" data-popper-placement="bottom-start">
-                <li><a class="dropdown-item" asp-controller="Categories" asp-action="Edit" asp-route-id="@Model.Id">Edit</a></li>
+                <li><a class="dropdown-item" asp-controller="Users" asp-action="Edit" asp-route-id="@Model.Id">Edit</a></li>
                 <li><a class="dropdown-item js-toggle-status" data-id="@Model.Id" href="javascript:;">Toggle Status</a></li>
             </ul>
         </div>

@@ -1,6 +1,6 @@
 ﻿
 @*<a asp-controller="Books" asp-action="Create" >Create</a>*@
-
+@*first way to validate AntiForgeryToken(1) *@
  @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery antiforgery 
 
 @{
@@ -75,9 +75,10 @@
         </div>
     </div>
 </div>
-
+@*first way to validate AntiForgeryToken(1) *@
 <input type="hidden" name="__RequestVerificationToken" value="@antiforgery.GetAndStoreTokens(Context).RequestToken" />
 
+@*second way to validate AntiForgeryToken(2) *@
 @*@Html.AntiForgeryToken();*@
 
 

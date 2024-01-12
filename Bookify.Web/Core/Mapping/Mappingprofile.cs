@@ -46,8 +46,22 @@ namespace Bookify.Web.Core.Mapping
 
             //Users
             CreateMap<ApplicationUser, UserViewModel>();  //source:ApplicationUser,dest:UserViewModel
+            //first way to map IdentityRole to SelectListItem(1)
+            CreateMap<IdentityRole, SelectListItem>() //source :identityRolr , dest :SelectListItem
+                .ForMember(destListItem =>destListItem.Value, options => options.MapFrom(sourceIdentityRole=> sourceIdentityRole.Name))
+                .ForMember(destListItem =>destListItem.Text, options => options.MapFrom(sourceIdentityRole=> sourceIdentityRole.Name));
+               
+            CreateMap<IEnumerable<SelectListItem>, UserFormViewModel>() //source:SelectListItem,dest:UserFormViewModel
+                .ForMember(destBookViewModel => destBookViewModel.Roles, options => options.MapFrom(sourceBook => sourceBook.Select(category => category.Value).ToList()));
 
-
+            CreateMap<UserFormViewModel, UserViewModel>();//source:UserFormViewModel,dest:ApplicationUser
+            #region Note (don't use automapper with ApplicationUser as Destination => only use new ApplicationUser
+            // CreateMap<UserFormViewModel, ApplicationUser>(); //source:UserFormViewModel,dest:ApplicationUser
+            // var user = _mapper.Map<ApplicationUser>(user); //do not do that
+            //here we can not use automapper with ApplicationUser as Destination with UserFormViewModel
+            //because automapper will initialize Id (in ApplicationUser) with null
+            //but when using new keyword (in new ApplicationUser) ,it(new) will initialize Id (in ApplicationUser) with (new Guid)
+            #endregion
         }
     }
 }

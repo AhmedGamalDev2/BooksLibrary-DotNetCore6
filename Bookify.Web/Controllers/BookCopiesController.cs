@@ -58,7 +58,7 @@ namespace Bookify.Web.Controllers
 
             return PartialView("_BookCopyRow", viewModel);
              
-        }
+        }//end
 
         [AjaxOnly]
         public IActionResult Edit(int id)
@@ -72,7 +72,7 @@ namespace Bookify.Web.Controllers
             viewModel.ShowRentalInput = copy.Book!.IsAvailableForRental;
 
             return PartialView("Form", viewModel);
-        }
+        }//end
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -95,7 +95,7 @@ namespace Bookify.Web.Controllers
             var viewModel = _mapper.Map<BookCopyViewModel>(copy);
 
             return PartialView("_BookCopyRow", viewModel);
-        }
+        }//end
 
         [HttpPost]
         [ValidateAntiForgeryToken]
