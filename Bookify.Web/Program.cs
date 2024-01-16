@@ -3,8 +3,10 @@ using Bookify.Web.Helpers;
 using Bookify.Web.Seedings;
 using Bookify.Web.Seeds;
 using Bookify.Web.Settings;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net;
 using System.Reflection.Emit;
 using UoN.ExpressiveAnnotations.NetCore.DependencyInjection;
 
@@ -75,19 +77,34 @@ builder.Services.Configure<IdentityOptions>(options =>
     //    options.Lockout.MaxFailedAccessAttempts = 5;
     //    options.Lockout.AllowedForNewUsers = true;
 
-    //    // User settings.
-         options.User.AllowedUserNameCharacters =
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-         options.User.RequireUniqueEmail = true;
+    //// User settings.
+    options.User.AllowedUserNameCharacters =
+   "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+    options.User.RequireUniqueEmail = true;
 });
+
+////Cookie settings
+/*
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+    options.Cookie.Name = "YourAppCookieName";
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromSeconds(10);//.FromMinutes(60);
+    options.LoginPath = "/Identity/Account/Login";
+    // ReturnUrlParameter requires 
+    //using Microsoft.AspNetCore.Authentication.Cookies;
+    options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
+    options.SlidingExpiration = true;
+});*/
 #endregion
-
-
+/*here, add scope service for this class ApplicationUserClaimsPrincipalFactory to create new claim for a user when the program run or user login*/
+builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationUserClaimsPrincipalFactory>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddAutoMapper(assemblies: AssemblyBuilder.GetAssembly(typeof(Mappingprofile)));
 builder.Services.AddExpressiveAnnotations();
- 
- 
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -104,7 +121,7 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
- 
+
 app.UseRouting();
 
 app.UseAuthentication();
@@ -121,13 +138,13 @@ var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Applicati
 await DefaultRoles.SeedRolesAsync(roleManager);
 await DefaultUsers.SeedUserAsync(userManager);
 
- 
+
 #endregion
- 
+
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Users}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 
 app.Run();

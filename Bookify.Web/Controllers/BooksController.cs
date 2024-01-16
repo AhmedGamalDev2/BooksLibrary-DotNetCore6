@@ -34,7 +34,6 @@ namespace Bookify.Web.Controllers
             };
             _cloudinary = new Cloudinary(account);
         }
-        [Authorize(Roles = "Admin")]
         public IActionResult Index()
         {
             return View();

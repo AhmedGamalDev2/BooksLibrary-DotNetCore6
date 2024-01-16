@@ -68,8 +68,8 @@ function onModalBegin() {
 }
 
 function onModalSuccess(row) {
-    console.log(row)
-    console.log(updatedrow)
+    //console.log(row)
+    //console.log(updatedrow)
 
     showSuccessMessage();
     $('#Modal').modal('hide');
@@ -77,14 +77,16 @@ function onModalSuccess(row) {
         datatable.row(updatedrow).remove().draw();
         updatedrow = undefined;
         //////update LastUpdatedOn cell
-        UpdateLastUpdatedOnCell();
-        console.log(updatedrow)
-
+        //UpdateLastUpdatedOnCell();
     }
-    console.log(updatedrow)
+
     var newRow = $(row); //in case of adding row using modal or edit because in case of edit we remove the current row
     datatable.row.add(newRow).draw();
-
+    //the new row that added will be flash animated
+    newRow.addClass('animate__animated animate__flash'); //the flah animated will occur in adding or update or edit row
+    setTimeout(function () {
+        newRow.removeClass('animate__animated animate__flash');
+    }, 3000);
 }
 function onModalComplete() {
     $('body :submit').removeAttr('disabled').removeAttr('data-kt-indicator');
@@ -93,7 +95,7 @@ function onModalComplete() {
 }
 
 function UpdateLastUpdatedOnCell() { //update LastUpdatedOn cell
-    $.get({
+    $.get({ //this function not as long as need it 
         url: updatedbtn.data('path'),//(data-path) like => data-url="/Categories/ToggleStatus/@Model.Id"
         success: function (lastUpdatedOn) {
             var rowResetPasswordOrUpdatedRow = updatedbtn.parents('tr');
@@ -338,7 +340,7 @@ $(document).ready(function () {
                         },
                         success: function (lastUpdatedOn) {
                             //var formattedDate = moment(lastUpdatedOn).format('L'); // this if case you don't send like =>( this user.LastUpdatedOn.ToString()) contain ToString()
-                            console.log(lastUpdatedOn)
+                            //console.log(lastUpdatedOn)
                             /* more formats
                             var formattedDate = moment(lastUpdatedOn).format('M/D/YYYY h:mm:ss A'); =>equal user.LastUpdatedOn.ToString())
                             var formattedDate = moment(lastUpdatedOn).format('ll');
@@ -374,4 +376,49 @@ $(document).ready(function () {
     $('.js-SignOut').on("click", function () {
         $('#SignOut').submit();
     })
+
+    //Handle Confirm unlock الدالة دي ممكن تستخدم لأي رسالة تأكيد في البرنامج
+    //1-used for confirm unlock user
+    $('body').delegate('.js-confirm', 'click', function () {
+        var btn = $(this);
+        var row = btn.parents('tr');
+
+        bootbox.confirm({
+            message: btn.data('message'),
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-secondary'
+                }
+            },
+            callback: function (result) {
+                if (result) {
+                    $.post({
+                        url: btn.data('url'),
+                        data: {
+                            '__RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function () {
+                            row.addClass('animate__animated animate__flash');
+                            showSuccessMessage();
+                        },
+                        error: function () {
+                            showErrorMessage();
+                        },
+                        complete: function () {
+                            setTimeout(function () {
+                                row.removeClass('animate__animated animate__flash');
+                            }, 3000);
+                        }
+                    });
+                }
+            }
+        });
+    });
+
+
 })

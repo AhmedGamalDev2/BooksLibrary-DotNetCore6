@@ -20,13 +20,15 @@ namespace Bookify.Web.Areas.Identity.Pages.Account
 {
     public class LoginModel : PageModel
     {
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
 
-        public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger, UserManager<ApplicationUser> userManager)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _userManager = userManager;
         }
 
         /// <summary>
@@ -66,15 +68,16 @@ namespace Bookify.Web.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [Required]
-            [EmailAddress]
-            public string Email { get; set; }
+            [Display(Name = "Username/Email")]
+            //[EmailAddress] => comment this to aggree login with username and email
+            public string Username { get; set; }// it was Email, you should change all email to username
 
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [Required]
-            [DataType(DataType.Password)]
+           [DataType(DataType.Password)]
             public string Password { get; set; }
 
             /// <summary>
@@ -110,9 +113,23 @@ namespace Bookify.Web.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
+                //var user = await _userManager.FindByEmailAsync(Input.Username); // not correct here
+                #region From me
+                /*now , I don't know ther Inuput.Username is Email or Username => so I should do that :*/
+                //_userManager.Users => get all users then i deal with them as _context (SingleOrDefault)
+                //if we used (NormalizedEmail and NormalizedUserName)  is the better
+                //if the user IsDeleted , he can't login
+                var user = _userManager.Users
+                    .SingleOrDefault(r =>( r.NormalizedEmail == Input.Username.ToUpper() || r.NormalizedUserName == Input.Username.ToUpper() )&& !(r.IsDeleted));
+               if(user is null)
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    return Page();
+                }
+                #endregion
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(user, Input.Password, Input.RememberMe, lockoutOnFailure: true);//lockoutOnFailure: true => this means that it will count failure times of login
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");

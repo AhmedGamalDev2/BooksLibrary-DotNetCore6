@@ -127,8 +127,8 @@
                 <div class="btn btn-flex align-items-center bg-hover-white bg-hover-opacity-10 py-2 px-2 px-md-3" data-kt-menu-trigger="click" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
                     <!--begin::Name-->
                     <div class="d-none d-md-flex flex-column align-items-end justify-content-center me-2 me-md-4">
-                        <span class="text-muted fs-8 fw-semibold lh-1 mb-1">Max</span>
-                        <span class="text-white fs-8 fw-bold lh-1">UX Designer</span>
+                        <span class="text-muted fs-8 fw-semibold lh-1 mb-1">Welcome</span>
+                        <span class="text-white fs-8 fw-bold lh-1">@User?.FindFirst(ClaimTypes.GivenName)!.Value</span>@*ClaimTypes.GivenName crear FullName*@
                     </div>
                     <!--end::Name-->
                     <!--begin::Symbol-->
@@ -148,18 +148,18 @@
                                 <img alt="Logo" src="~/assets/images/avatar.png" />
                             </div>
                             <!--end::Avatar-->
-                            <!--begin::Username-->
+                            <!--begin::Username => FullName not Username-->
                             <div class="d-flex flex-column">
                                 <div class="fw-bold d-flex align-items-center fs-5">
-                                    Max Smith
-                                    <span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">Pro</span>
+                                    @User?.FindFirst(ClaimTypes.GivenName)!.Value @*ClaimTypes.GivenName crear FullName*@
+                                    @*<span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">Pro</span>*@
                                 </div>
-                                <a href="#" class="fw-semibold text-muted text-hover-primary fs-7">max@kt.com</a>
+                                <a href="#" class="fw-semibold text-muted text-hover-primary fs-7">@User?.FindFirst(ClaimTypes.Email)!.Value</a>
                             </div>
                             <!--end::Username-->
                         </div>
                     </div>
-                    <!--end::Menu item-->
+               @*     <!--end::Menu item-->
                     <!--begin::Menu separator-->
                     <div class="separator my-2"></div>
                     <!--end::Menu separator-->
@@ -171,9 +171,9 @@
                     <!--begin::Menu separator-->
                     <div class="separator my-2"></div>
                     <!--end::Menu separator-->
-                    <!--begin::Menu item-->
+                    <!--begin::Menu item-->*@
                     <div class="menu-item px-5 my-1">
-                        <a href="../../demo14/dist/account/settings.html" class="menu-link px-5">Account Settings</a>
+                        <a asp-area="Identity" asp-page="/Account/Manage/Index" class="menu-link px-5">Account Settings</a>
                     </div>
                     <!--end::Menu item-->
                     <!--begin::Menu item-->

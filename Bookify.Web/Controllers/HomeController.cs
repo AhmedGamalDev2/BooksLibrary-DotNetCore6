@@ -2,7 +2,8 @@
 
 namespace Bookify.Web.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = AppRoles.Archive)]
+     
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

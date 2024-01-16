@@ -18,6 +18,9 @@ namespace Bookify.Web.Controllers
     public class UsersController : Controller
     {
         private readonly ApplicationDbContext _context;
+        /*the UserManger is for admins => how admins deal with users.
+         but User Account for themselves users => how users change them avater image or change password or change username.....
+         */
 
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -36,10 +39,11 @@ namespace Bookify.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-
+             
 
             var users = await _userManager.Users.ToListAsync();
             var usersViewModel = _mapper.Map<IEnumerable<UserViewModel>>(users);
+           
             return View(usersViewModel);
         }
 
@@ -283,7 +287,35 @@ namespace Bookify.Web.Controllers
             await _userManager.UpdateAsync(user);//inestead of  _context.SaveChanges();
             return Ok(user.LastUpdatedOn.ToString());
         }
-         
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UnLockUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user is null)
+                return NotFound();
+
+            var isLocked = await _userManager.IsLockedOutAsync(user);
+            if (isLocked)
+            {
+                await _userManager.SetLockoutEndDateAsync(user, null);
+            }
+            return Ok();
+            #region another way
+            /*
+              var endDate =  await _userManager.GetLockoutEndDateAsync(user);
+            if (endDate.HasValue && endDate > DateTimeOffset.Now)
+            {
+                // تعيين تاريخ انتهاء القفل إلى الوقت الحالي أو أي تاريخ في المستقبل
+                await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now);
+                await _userManager.ResetAccessFailedCountAsync(user); // إعادة تعيين عداد الفشل في تسجيل الدخول
+                return Ok("Unlocked");
+            }
+            return BadRequest("This user already non locked");
+             */
+            #endregion
+        }
+
         [HttpGet]
         [AjaxOnly]
         public async Task<IActionResult> GetLastUpdatedOn(string id)

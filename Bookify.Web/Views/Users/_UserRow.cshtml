@@ -11,6 +11,7 @@
     </td>
     <td>@Model.CreatedOn</td>
     <td class="js-updated-on">@Model.LastUpdatedOn</td>
+
     <td>
         <div class="dropdown ">
             <button class="btn btn-secondary dropdown-toggle show" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="true">
@@ -22,7 +23,9 @@
                 <li><a class="dropdown-item js-render-modal" data-path="/Users/GetLastUpdatedOn/@Model.Id"  data-update="true" data-title="Edit User" data-url="/Users/Edit/@Model.Id" data-id="@Model.Id" href="javascript:;">Edit</a></li>
                 <li><a class="dropdown-item js-toggle-status" data-url="/Users/ToggleStatus/@Model.Id" data-id="@Model.Id" href="javascript:;">Toggle Status</a></li>
                 <li><a class="dropdown-item js-render-modal" data-path="/Users/GetLastUpdatedOn/@Model.Id"  data-update="true" data-title="Reset Password" data-url="/Users/ResetPassword/@Model.Id" data-id="@Model.Id" href="javascript:;">Reset Password</a></li>
+                <li><a class="dropdown-item js-confirm" data-url="/Users/UnLockUser/@Model.Id" data-id="@Model.Id" href="javascript:;" data-message="Are you sure that you need to unlock this user?">UnLock</a></li>
             </ul>
         </div>
     </td>
+
 </tr>
