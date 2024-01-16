@@ -1,11 +1,11 @@
 ﻿@model UserFormViewModel
 
 @{
-    ViewData["Title"] = "Create User";
+    ViewData["Title"] = string.IsNullOrEmpty(Model?.Id) ? "Create User":" Edit User" ;
 }
- 
+
 <form asp-action="@(!string.IsNullOrEmpty(Model?.Id) ? "Edit" : "Create")"
-      data-ajax-method="post" 
+      data-ajax-method="post"
       data-ajax="true"
       data-ajax-begin="onModalBegin"
       data-ajax-success="onModalSuccess"
@@ -23,7 +23,7 @@
             <label asp-for="FullName"></label>
         </div>
         <span asp-validation-for="FullName" class="text-danger d-block"></span>
-    
+
     </div>
 
     <div class="mb-5">
@@ -43,52 +43,55 @@
     </div>
 
     @*SelectedRoles*@
-    @*(5)العنصر دا بيظهر فيه مشكلة وهي ان لما بتحمل الصفحة  او الفورم الجزء الخاص بال select2 بيبقى موجود داخل ال  document.ready 
-        علشان كدا مش بيسمع علطول ويبقى شكلها مش مظبوط علشان كدا هنستخدم ال delegate مع select2 زي ما استخدمناها مع عناصر من قبل كدا 
-        ** يعني من الاخر ال select2 اللي داخل الفورم بتتعرض لما تكون ال document.read() تكون خلصت شغلها
+    @*(5)العنصر دا بيظهر فيه مشكلة وهي ان لما بتحمل الصفحة  او الفورم الجزء الخاص بال select2 بيبقى موجود داخل ال  document.ready
+    علشان كدا مش بيسمع علطول ويبقى شكلها مش مظبوط علشان كدا هنستخدم ال delegate مع select2 زي ما استخدمناها مع عناصر من قبل كدا
+    ** يعني من الاخر ال select2 اللي داخل الفورم بتتعرض لما تكون ال document.read() تكون خلصت شغلها
 
     *@
- 
-            <div class="mb-5">
-                <div class="mb-2">
-                    <select class="form-select form-select-solid js-select2" data-placeholder="Select Roles" asp-for="SelectedRoles" asp-items="@Model?.Roles">
-                    </select>
-                    <label asp-for="SelectedRoles"></label>
-                </div>
-                <span asp-validation-for="SelectedRoles" class="text-danger d-block"></span>
-            </div>
-       
-
-  <div class="mb-5">
-        <div class="form-floating mb-2">
-            <input type="text" class="form-control form-control-solid" placeholder="Password" asp-for="Password" />
-            <label asp-for="Password"></label>
-        </div>
-        <span asp-validation-for="Password" class="text-danger d-block"></span>
-    </div>
 
     <div class="mb-5">
-        <div class="form-floating mb-2">
-            <input type="text" class="form-control form-control-solid" placeholder="Confirm password" asp-for="ConfirmPassword" />
-            <label asp-for="ConfirmPassword"></label>
+        <div class="mb-2">
+            <select class="form-select form-select-solid js-select2" data-placeholder="Select Roles" asp-for="SelectedRoles" asp-items="@Model?.Roles">
+            </select>
+            <label asp-for="SelectedRoles"></label>
         </div>
-        <span asp-validation-for="ConfirmPassword" class="text-danger d-block"></span>
+        <span asp-validation-for="SelectedRoles" class="text-danger d-block"></span>
     </div>
-  
+
+
+
+    @if (string.IsNullOrEmpty(Model?.Id))
+    {
+        <div class="mb-5">
+            <div class="form-floating mb-2">
+                <input type="password" placeholder="Password" asp-for="Password" class="form-control form-control-solid " />@* @(!string.IsNullOrEmpty(Model?.Id) ? "d-none" : "")*@
+                <label asp-for="Password"></label>
+            </div>
+            <span asp-validation-for="Password" class="text-danger d-block"></span>
+        </div>
+
+
+        <div class="mb-5">
+            <div class="form-floating mb-2">
+                <input type="password" class="form-control form-control-solid" placeholder="Confirm password" asp-for="ConfirmPassword" />
+                <label asp-for="ConfirmPassword"></label>
+            </div>
+            <span asp-validation-for="ConfirmPassword" class="text-danger d-block"></span>
+        </div>
+    }
     <partial name="_ModalFooter" />
 </form>
 
 
 @section Scripts
-{
+    {
     @* important
-         لو احنا وضعنا ملف الفاليديشن هنا زي ما محطوط كدا  هيدي الخطأ دا 
+         لو احنا وضعنا ملف الفاليديشن هنا زي ما محطوط كدا  هيدي الخطأ دا
          Uncaught TypeError: Cannot read properties of undefined (reading 'unobtrusive')
         ودا معناه ان الملف الخاص بالفاليديشن على الرغم ان احنا حطناه هنا اهو
         بس هو يقصد ان استخدم الدوال بتاع الفاليديشن قبل ما يشوف ملف الفاليديشن اللي احنا اضفناه
         علشان كدا محتاجين نحط ملف الفاليديشن الاول حطنا في صفحة ال : Index (1)
-        <partial name="_ValidationScriptsPartial" /> 
-    *@ 
+        <partial name="_ValidationScriptsPartial" />
+    *@
 }
- 
- 
+

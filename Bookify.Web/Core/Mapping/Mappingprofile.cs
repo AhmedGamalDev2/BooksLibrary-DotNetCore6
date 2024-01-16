@@ -46,6 +46,11 @@ namespace Bookify.Web.Core.Mapping
 
             //Users
             CreateMap<ApplicationUser, UserViewModel>();  //source:ApplicationUser,dest:UserViewModel
+            CreateMap<UserFormViewModel, ApplicationUser>()
+                .ForMember(dest => dest.NormalizedEmail, operation => operation.MapFrom(src => src.Email.ToUpper()))
+                .ForMember(dest => dest.NormalizedUserName, operation => operation.MapFrom(src => src.Username.ToUpper()))
+                .ReverseMap();  //source:UserFormViewModel,dest:ApplicationUser => used in edit not in create action
+
             //first way to map IdentityRole to SelectListItem(1)
             CreateMap<IdentityRole, SelectListItem>() //source :identityRolr , dest :SelectListItem
                 .ForMember(destListItem =>destListItem.Value, options => options.MapFrom(sourceIdentityRole=> sourceIdentityRole.Name))
@@ -55,7 +60,7 @@ namespace Bookify.Web.Core.Mapping
                 .ForMember(destBookViewModel => destBookViewModel.Roles, options => options.MapFrom(sourceBook => sourceBook.Select(category => category.Value).ToList()));
 
             CreateMap<UserFormViewModel, UserViewModel>();//source:UserFormViewModel,dest:ApplicationUser
-            #region Note (don't use automapper with ApplicationUser as Destination => only use new ApplicationUser
+            #region Note (don't use automapper with ApplicationUser as Destination => only use new ApplicationUser => mostly in create action
             // CreateMap<UserFormViewModel, ApplicationUser>(); //source:UserFormViewModel,dest:ApplicationUser
             // var user = _mapper.Map<ApplicationUser>(user); //do not do that
             //here we can not use automapper with ApplicationUser as Destination with UserFormViewModel

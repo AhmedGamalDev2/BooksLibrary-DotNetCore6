@@ -1,4 +1,5 @@
 ﻿using Bookify.Web.Core.Consts;
+using Bookify.Web.Filters;
 using Bookify.Web.Settings;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
@@ -9,6 +10,7 @@ using System.Linq.Dynamic.Core;
 
 namespace Bookify.Web.Controllers
 {
+    [Authorize(Roles = AppRoles.Archive)]
     public class BooksController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -128,6 +130,7 @@ namespace Bookify.Web.Controllers
                 return View("Form", returnModel);
             }
             var book = _mapper.Map<Book>(model); // Image cannot map with automapper
+            book.CreatedById = User?.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             //deal with image
             if (model.Image is not null)
             {
@@ -189,7 +192,8 @@ namespace Bookify.Web.Controllers
             _context.SaveChanges();
             return RedirectToAction(nameof(Details),new {id= book.Id});// here(id field) must equal and be the same Details parameter(int id)
         }
-
+        //[HttpGet]
+        [AjaxOnly]
         public IActionResult Edit(int id)
         {
             var book = _context.Books.Include(b => b.Categories).SingleOrDefault(b => b.Id == id);
@@ -219,7 +223,9 @@ namespace Bookify.Web.Controllers
                 var returnModel = PopulateViewModel(model);
                 return View("Form", returnModel);
             }
-            var book = _context.Books.Include(b => b.Categories).SingleOrDefault(b => b.Id == model.Id);
+            var book = _context.Books
+                .Include(b => b.Categories)
+                .Include(book=>book.Copies).SingleOrDefault(b => b.Id == model.Id);
             if (book is null)
             {
                 return NotFound();
@@ -313,11 +319,19 @@ namespace Bookify.Web.Controllers
             }
             book = _mapper.Map(model, book); 
             book.LastUpdatedOn = DateTime.Now;
+            book.LastUpdatedById = User?.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             //book.ImagePublicId = imagePublicId; //cloudinary
             foreach (var item in model.SelectedCategoryIds)
             { //fill BookCategory table
                 // here in foreach ordering wiht automapper is must هنا الترتيب لازم وعدم الترتيب يحدث مشكلة
                 book.Categories.Add(new BookCategory { CategoryId = item });
+            }
+            if (!model.IsAvailableForRental)
+            { // if the book is not available for rental so all copies (related with it) is not available for rental
+                foreach(var copy in book.Copies)
+                {
+                    copy.IsAvailableForRental = false;
+                }
             }
             _context.SaveChanges();
             return RedirectToAction(nameof(Details),new {id=book.Id}); // here(id field) must equal and be the same Details parameter(int id)
@@ -334,10 +348,10 @@ namespace Bookify.Web.Controllers
 
             book.IsDeleted = !book.IsDeleted;
             book.LastUpdatedOn = DateTime.Now;
-
+            book.LastUpdatedById = User?.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             _context.SaveChanges();
 
-            return Ok();
+            return Ok(book.LastUpdatedOn.ToString());
         }
         public IActionResult AllowBook(BookFormViewModel model)
         {

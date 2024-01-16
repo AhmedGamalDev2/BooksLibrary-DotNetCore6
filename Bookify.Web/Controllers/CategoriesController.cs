@@ -1,6 +1,9 @@
 ﻿
+using Bookify.Web.Filters;
+
 namespace Bookify.Web.Controllers
 { //Hello
+    [Authorize(Roles = AppRoles.Archive)]
     public class CategoriesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -37,6 +40,7 @@ namespace Bookify.Web.Controllers
         }
 
         [HttpGet]
+        [AjaxOnly]
         public IActionResult Create()
         {
             return View("Form");
@@ -50,7 +54,7 @@ namespace Bookify.Web.Controllers
                 return View("Form", model);
             //convert model(CategoryFormViewModel) to Category
             var category = _mapper.Map<Category>(model);
-
+            category.CreatedById = User?.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             #region mapping without automapper
             //var category = new Category { Name = model.Name };
             #endregion
@@ -61,6 +65,7 @@ namespace Bookify.Web.Controllers
         }
 
         [HttpGet]
+        [AjaxOnly]
         public IActionResult Edit(int id)
         {
             var category = _context.Categories.Find(id);
@@ -92,6 +97,7 @@ namespace Bookify.Web.Controllers
                 return NotFound();
             
             category = _mapper.Map(model,category); //(specially in Edit) not _mapper.Map<Category>(model); ..error
+            category.LastUpdatedById = User?.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             #region mapping without automapper
             //category.Name = model.Name;
             #endregion
@@ -112,8 +118,9 @@ namespace Bookify.Web.Controllers
                 return NotFound();
             category.IsDeleted  = !category.IsDeleted;
             category.LastUpdatedOn  = DateTime.Now;
+            category.LastUpdatedById = User?.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             _context.SaveChanges();
-            return Ok(category);
+            return Ok(category.LastUpdatedOn.ToString());//Ok(category);
         }
         public IActionResult AllowCategory(CategoryFormViewModel model)
         {

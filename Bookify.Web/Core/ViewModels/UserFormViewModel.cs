@@ -20,22 +20,30 @@ namespace Bookify.Web.Core.ViewModels
          
         [Remote("IsEmailExisted", null!, AdditionalFields = "Id", ErrorMessage = Errors.Dublicated)]
         public string Email { get; set; } = null!;
- 
-        
+
         [DataType(DataType.Password),
             StringLength(100, ErrorMessage = Errors.MaxMinLenth, MinimumLength = 8),
              RegularExpression(pattern: RegexPatterns.Password,ErrorMessage =Errors.WeakPassword)]
-        public string Password { get; set; } = null!;
+        [RequiredIf("Id == null", ErrorMessage = Errors.RequiredField)] //this (RequiredIf("Id == null") in case of create not edit
+        public string? Password { get; set; } 
         
         [DataType(DataType.Password),
             Compare("Password", ErrorMessage = Errors.ConfirmPasswordNotMatch),Display(Name = "Confirm password")]
-        public string ConfirmPassword { get; set; } = null!;
+        [RequiredIf("Id == null", ErrorMessage =Errors.RequiredField)]//this (RequiredIf("Id == null") in case of create not edit
+        public string? ConfirmPassword { get; set; }
 
         [Display(Name = "Roles")]
         public IList<string> SelectedRoles { get; set; } = new List<string>(); //SelectedCategoryIds
         public IEnumerable<SelectListItem>? Roles { get; set; } //// another way , may be  public IEnumerable<Category>? Categories { get; set; }
 
         /********************************************/
-       
+        //public UserFormViewModel()
+        //{
+        //    if (Id != null)
+        //    {
+        //        Password = null!;
+        //        ConfirmPassword = null!;
+        //    }
+        //}
     }
 }

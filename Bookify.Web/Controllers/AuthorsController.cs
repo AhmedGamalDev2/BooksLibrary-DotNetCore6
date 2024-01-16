@@ -1,6 +1,9 @@
 ﻿
+using System.Security.Claims;
+
 namespace Bookify.Web.Controllers
 { //Hello
+    [Authorize(Roles = AppRoles.Archive)]
     public class AuthorsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -50,7 +53,7 @@ namespace Bookify.Web.Controllers
                 return View("Form", model);
             //convert model(AuthorFormViewModel) to Author
             var author = _mapper.Map<Author>(model);
-
+                author.CreatedById = User?.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             #region mapping without automapper
             //var author = new Author { Name = model.Name };
             #endregion
@@ -96,7 +99,7 @@ namespace Bookify.Web.Controllers
             //author.Name = model.Name;
             #endregion
             author.LastUpdatedOn = DateTime.Now;
-
+            author.LastUpdatedById = User?.FindFirst(ClaimTypes.NameIdentifier)!.Value; ;
             _context.SaveChanges();
             TempData["SuccessMessage"] = "Saved Successfully: " + author.Name;
 
@@ -112,8 +115,9 @@ namespace Bookify.Web.Controllers
                 return NotFound();
             author.IsDeleted = !author.IsDeleted;
             author.LastUpdatedOn = DateTime.Now;
+            author.LastUpdatedById = User?.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             _context.SaveChanges();
-            return Ok(author);
+            return Ok(author.LastUpdatedOn.ToString());
         }
         public IActionResult AllowAuthor(AuthorFormViewModel model)
         {

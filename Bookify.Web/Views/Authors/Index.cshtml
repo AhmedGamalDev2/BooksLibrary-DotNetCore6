@@ -76,7 +76,7 @@
                             <tr>
                                 <td>@author.Name</td>
                                 <td>
-                                    <span class=" badge badge-light-@(author.IsDeleted ? "danger" : "success") jsStatus">
+                                        <span class=" badge badge-light-@(author.IsDeleted ? "danger" : "success") js-status">
                                         @(author.IsDeleted ? "Deleted" : "Available")
                                     </span>
                                 </td>
@@ -90,7 +90,7 @@
 
                                         <ul class="dropdown-menu  " aria-labelledby="dropdownMenuButton1" style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(0px, 39px);" data-popper-placement="bottom-start">
                                             <li><a class="dropdown-item" asp-controller="Authors" asp-action="Edit" asp-route-id="@author.Id">Edit</a></li>
-                                            <li><a class="dropdown-item js-toggle-status" data-id="@author.Id" href="javascript:;">Toggle Status</a></li>
+                                            <li><a class="dropdown-item js-toggle-status" data-url="/Authors/ToggleStatus/@author.Id" data-id="@author.Id" href="javascript:;">Toggle Status</a></li>
                                         </ul>
                                     </div>
                                 </td>

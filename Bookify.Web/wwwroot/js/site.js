@@ -1,8 +1,9 @@
 ﻿// Shared variables
 var table;
 var datatable;
-var updatedRow;
-
+var updatedrow;
+var updatedbtn;
+var btnPassword;
 var exportedCols = [];
 
 
@@ -52,7 +53,7 @@ function showErrorMessage(message = 'Something went wrong!') {
     Swal.fire({
         icon: 'error',
         title: 'Oops...',
-        text: message.responseText != undefined ? message.responseText:message,
+        text: message.responseText != undefined ? message.responseText : message,
         customClass: {
             confirmButton: "btn btn-primary"
         }
@@ -65,34 +66,55 @@ function disableSubmitButton() {
 function onModalBegin() {
     disableSubmitButton();
 }
-function onModalComplete() {
-    $('body :submit').removeAttr('disabled').removeAttr('data-kt-indicator');
-}
+
 function onModalSuccess(row) {
+    console.log(row)
+    console.log(updatedrow)
+
     showSuccessMessage();
     $('#Modal').modal('hide');
+    if (updatedrow !== undefined) { // // in case of update or edit row for modal like ResetPassword for user
+        datatable.row(updatedrow).remove().draw();
+        updatedrow = undefined;
+        //////update LastUpdatedOn cell
+        UpdateLastUpdatedOnCell();
+        console.log(updatedrow)
 
-    if (updatedRow !== undefined) {
-        datatable.row(updatedRow).remove().draw();
-        updatedRow = undefined;
     }
-
-    var newRow = $(row);
+    console.log(updatedrow)
+    var newRow = $(row); //in case of adding row using modal or edit because in case of edit we remove the current row
     datatable.row.add(newRow).draw();
+
 }
+function onModalComplete() {
+    $('body :submit').removeAttr('disabled').removeAttr('data-kt-indicator');
+    console.log("complete")
+
+}
+
+function UpdateLastUpdatedOnCell() { //update LastUpdatedOn cell
+    $.get({
+        url: updatedbtn.data('path'),//(data-path) like => data-url="/Categories/ToggleStatus/@Model.Id"
+        success: function (lastUpdatedOn) {
+            var rowResetPasswordOrUpdatedRow = updatedbtn.parents('tr');
+            rowResetPasswordOrUpdatedRow.find('.js-updated-on').html(lastUpdatedOn);
+        },
+    });
+}
+
 //Select2
 function applySelect2() {
     $('.js-select2').select2();
     $('.js-select2').on('select2:select', function (e) { // here, we revalidate on select2 when select event
         $('form').not('#SignOut').validate().element('#' + $(this).attr('id'));
-        
+
     });
     $('.js-select2').on('select2:unselect', function (e) {// here, we revalidate on select2 when unselect event
         $('form').not('#SignOut').validate().element('#' + $(this).attr('id'));
     });
 }
 
- 
+
 
 //datatables
 var headers = $('th');
@@ -130,7 +152,7 @@ var KTDatatables = function () {
                     extend: 'copyHtml5',
                     title: documentTitle,
                     exportOptions: {
-                        columns: [0,1,2,3]  // تحديد الأعمدة التي يمكن تضمينها في التصدير
+                        columns: [0, 1, 2, 3]  // تحديد الأعمدة التي يمكن تضمينها في التصدير
                     }
                 },
                 {
@@ -153,7 +175,7 @@ var KTDatatables = function () {
                     exportOptions: { // ودي طريقة تانية 
                         columns: exportedCols
                     },
-                 
+
                 }
             ]
         }).container().appendTo($('#kt_datatable_example_buttons'));
@@ -198,14 +220,14 @@ var KTDatatables = function () {
     };
 }();
 
- 
+
 function disableSubmitButton() { //f16
     $('body :submit').attr('disabled', 'disabled').attr('data-kt-indicator', 'on');
 }
 
 $(document).ready(function () {
 
-     
+
 
 
     //Disable submit button //f16
@@ -221,11 +243,11 @@ $(document).ready(function () {
 
         //هل الصفحة اللي واقف فيها دلوقت (اي صفحة اروح ليها ) موجود فيها فيلات الفاليديشن
         var isValid = $(this).valid(); // this function (valid()) needs validation files  =>//not("#SignOut") => here, this form (with id="#SignOut") don,t have validation files ,,,,   لان دا يستدعي ان انا اضع فيلات الفاليديشن في صفحة اللييه أوت واحنا مش عايزين نضعها في صفحة اللييه أوت علشان حجمها كبير (layout page)  
-         
+
         if (isValid) disableSubmitButton();
     });
     //tinymce textarea
-    if ($('.js-tinymce').length> 0) { // (if)(this means if there page (index or form ) has element that has class with .js-tinymce) => because tinymce('.js-tinymce') not existed(give error) in index page , but only existed in form pages
+    if ($('.js-tinymce').length > 0) { // (if)(this means if there page (index or form ) has element that has class with .js-tinymce) => because tinymce('.js-tinymce') not existed(give error) in index page , but only existed in form pages
         var options = { selector: ".js-tinymce", height: "440" };
 
         if (KTThemeMode.getMode() === "dark") {
@@ -239,14 +261,14 @@ $(document).ready(function () {
     $('.js-datepicker').daterangepicker({
         singleDatePicker: true,
         autoApply: true,
-        drops:'up',
+        drops: 'up',
         maxDate: new Date()
     })
 
 
     //Select2 //repeated in js-render-modal
     applySelect2();
-     
+
     /**start datatable*/
     //$('table').DataTable();
     KTUtil.onDOMContentLoaded(function () {
@@ -262,17 +284,18 @@ $(document).ready(function () {
     //Handle bootstrap modal => Add form with ajax 
     $('body').delegate('.js-render-modal', 'click', function () {
         var btn = $(this);
+        updatedbtn = $(this);
         var modal = $('#Modal');
+        //console.log("modal")
         //console.log(modal)
         modal.find('#ModalLabel').text(btn.data('title'));
-
-        if (btn.data('update') !== undefined) {
+        //لوانا عايز اي صف يحصل ليه تعديل  زي مثلا تعديل كلمة السر يبقى لازما الصف دا او الزر دا نضع ليه  :: data-update
+        if (btn.data('update') !== undefined) { // in case of update or edit row for modal like ResetPassword for user
             updatedrow = btn.parents('tr');
         }
-
         $.get({
             url: btn.data('url'),
-            
+
             success: function (form) {
                 modal.find('.modal-body').html(form);
                 $.validator.unobtrusive.parse(modal);
@@ -289,10 +312,11 @@ $(document).ready(function () {
     });
 
 
-     //Handle Toggle Status for books
+    //Handle Toggle Status for books
     $('body').delegate('.js-toggle-status', 'click', function () {
         var btn = $(this);
-
+        var row = btn.parents('tr');
+        //console.log(row)
         bootbox.confirm({
             message: "Are you sure that you need to toggle this item status?",
             buttons: {
@@ -308,22 +332,37 @@ $(document).ready(function () {
             callback: function (result) {
                 if (result) {
                     $.post({
-                        url: btn.data('url'),
+                        url: btn.data('url'),//like => data-url="/Categories/ToggleStatus/@Model.Id"
                         data: {
                             '__RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
                         },
                         success: function (lastUpdatedOn) {
-                            var row = btn.parents('tr');
+                            //var formattedDate = moment(lastUpdatedOn).format('L'); // this if case you don't send like =>( this user.LastUpdatedOn.ToString()) contain ToString()
+                            console.log(lastUpdatedOn)
+                            /* more formats
+                            var formattedDate = moment(lastUpdatedOn).format('M/D/YYYY h:mm:ss A'); =>equal user.LastUpdatedOn.ToString())
+                            var formattedDate = moment(lastUpdatedOn).format('ll');
+                            var formattedDate = moment(lastUpdatedOn).format('L'); => equal user.LastUpdatedOn.ToString()
+                            var formattedDate = moment(lastUpdatedOn).format("MMM Do YY");
+                            console.log(formattedDate);
+                            */
+                            //var row = btn.parents('tr');
                             var status = row.find('.js-status');
                             var newStatus = status.text().trim() === 'Deleted' ? 'Available' : 'Deleted';
                             status.text(newStatus).toggleClass('badge-light-success badge-light-danger');
                             row.find('.js-updated-on').html(lastUpdatedOn);
                             row.addClass('animate__animated animate__flash');
-
                             showSuccessMessage();
                         },
+
                         error: function () {
                             showErrorMessage();
+                        },
+                        complete: function () {
+
+                            setTimeout(function () {
+                                row.removeClass('animate__animated animate__flash');
+                            }, 3000);
                         }
                     });
                 }
@@ -335,6 +374,4 @@ $(document).ready(function () {
     $('.js-SignOut').on("click", function () {
         $('#SignOut').submit();
     })
-
-  
 })

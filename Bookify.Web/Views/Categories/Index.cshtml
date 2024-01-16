@@ -9,106 +9,107 @@
 
 <div class="card shadow-sm">
     @*start: datatable header card *@
-    <partial name="_DatatablesCardHeader" >
-     
-      @*end :: datatable header card *@
-    @********second header card  ************@
-    <div class="card-header">
-        <div class="card-title h3">
-            <div class="symbol symbol-40px me-4">
-                <div class="symbol-label fs-2 fw-semibold text-success">
-                    <!--begin::Svg Icon | path: icons/duotune/general/gen002.svg-->
-                    <span class="svg-icon svg-icon-2 svg-icon-primary">
+    <partial name="_DatatablesCardHeader">
+
+        @*end :: datatable header card *@
+        @********second header card  ************@
+        <div class="card-header">
+            <div class="card-title h3">
+                <div class="symbol symbol-40px me-4">
+                    <div class="symbol-label fs-2 fw-semibold text-success">
+                        <!--begin::Svg Icon | path: icons/duotune/general/gen002.svg-->
+                        <span class="svg-icon svg-icon-2 svg-icon-primary">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path opacity="0.3" d="M21.25 18.525L13.05 21.825C12.35 22.125 11.65 22.125 10.95 21.825L2.75 18.525C1.75 18.125 1.75 16.725 2.75 16.325L4.04999 15.825L10.25 18.325C10.85 18.525 11.45 18.625 12.05 18.625C12.65 18.625 13.25 18.525 13.85 18.325L20.05 15.825L21.35 16.325C22.35 16.725 22.35 18.125 21.25 18.525ZM13.05 16.425L21.25 13.125C22.25 12.725 22.25 11.325 21.25 10.925L13.05 7.62502C12.35 7.32502 11.65 7.32502 10.95 7.62502L2.75 10.925C1.75 11.325 1.75 12.725 2.75 13.125L10.95 16.425C11.65 16.725 12.45 16.725 13.05 16.425Z" fill="currentColor" />
+                                <path d="M11.05 11.025L2.84998 7.725C1.84998 7.325 1.84998 5.925 2.84998 5.525L11.05 2.225C11.75 1.925 12.45 1.925 13.15 2.225L21.35 5.525C22.35 5.925 22.35 7.325 21.35 7.725L13.05 11.025C12.45 11.325 11.65 11.325 11.05 11.025Z" fill="currentColor" />
+                            </svg>
+                        </span>
+                        <!--end::Svg Icon-->
+                    </div>
+                </div>
+                Categories
+            </div>
+            <div class="card-toolbar">
+                <a asp-controller="Categories" asp-action="Create" class="btn btn-sm btn-primary">
+                    <i class="bi bi-plus-square-dotted"></i>
+                    Add
+                </a>
+            </div>
+        </div>
+
+        <div class="card-body pt-0">
+            @if (!Model.Any())
+            {
+                <div class="alert alert-dismissible bg-light-warning border border-warning border-dashed d-flex flex-column flex-sm-row w-100 p-5 mb-10">
+                    <!--begin::Icon-->
+                    <!--begin::Svg Icon | path: icons/duotune/communication/com003.svg-->
+                    <span class="svg-icon svg-icon-2hx svg-icon-warning me-4 mb-5 mb-sm-0">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path opacity="0.3" d="M21.25 18.525L13.05 21.825C12.35 22.125 11.65 22.125 10.95 21.825L2.75 18.525C1.75 18.125 1.75 16.725 2.75 16.325L4.04999 15.825L10.25 18.325C10.85 18.525 11.45 18.625 12.05 18.625C12.65 18.625 13.25 18.525 13.85 18.325L20.05 15.825L21.35 16.325C22.35 16.725 22.35 18.125 21.25 18.525ZM13.05 16.425L21.25 13.125C22.25 12.725 22.25 11.325 21.25 10.925L13.05 7.62502C12.35 7.32502 11.65 7.32502 10.95 7.62502L2.75 10.925C1.75 11.325 1.75 12.725 2.75 13.125L10.95 16.425C11.65 16.725 12.45 16.725 13.05 16.425Z" fill="currentColor" />
-                            <path d="M11.05 11.025L2.84998 7.725C1.84998 7.325 1.84998 5.925 2.84998 5.525L11.05 2.225C11.75 1.925 12.45 1.925 13.15 2.225L21.35 5.525C22.35 5.925 22.35 7.325 21.35 7.725L13.05 11.025C12.45 11.325 11.65 11.325 11.05 11.025Z" fill="currentColor" />
+                            <rect opacity="0.3" x="2" y="2" width="20" height="20" rx="10" fill="currentColor" />
+                            <rect x="11" y="14" width="7" height="2" rx="1" transform="rotate(-90 11 14)" fill="currentColor" />
+                            <rect x="11" y="17" width="2" height="2" rx="1" transform="rotate(-90 11 17)" fill="currentColor" />
                         </svg>
                     </span>
                     <!--end::Svg Icon-->
+                    <!--end::Icon-->
+                    <!--begin::Content-->
+                    <div class="d-flex flex-column pe-0 pe-sm-10 align-self-center">
+                        <h5 class="mb-1">No categories found!</h5>
+                    </div>
+                    <!--end::Content-->
                 </div>
-            </div>
-            Categories
-        </div>
-        <div class="card-toolbar">
-            <a asp-controller="Categories" asp-action="Create" class="btn btn-sm btn-primary">
-                <i class="bi bi-plus-square-dotted"></i>
-                Add
-            </a>
-        </div>
-    </div>
-                  
-    <div class="card-body pt-0">
-        @if (!Model.Any())
-        {
-            <div class="alert alert-dismissible bg-light-warning border border-warning border-dashed d-flex flex-column flex-sm-row w-100 p-5 mb-10">
-                <!--begin::Icon-->
-                <!--begin::Svg Icon | path: icons/duotune/communication/com003.svg-->
-                <span class="svg-icon svg-icon-2hx svg-icon-warning me-4 mb-5 mb-sm-0">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect opacity="0.3" x="2" y="2" width="20" height="20" rx="10" fill="currentColor" />
-                        <rect x="11" y="14" width="7" height="2" rx="1" transform="rotate(-90 11 14)" fill="currentColor" />
-                        <rect x="11" y="17" width="2" height="2" rx="1" transform="rotate(-90 11 17)" fill="currentColor" />
-                    </svg>
-                </span>
-                <!--end::Svg Icon-->
-                <!--end::Icon-->
-                <!--begin::Content-->
-                <div class="d-flex flex-column pe-0 pe-sm-10 align-self-center">
-                    <h5 class="mb-1">No categories found!</h5>
-                </div>
-                <!--end::Content-->
-            </div>
-        }
-        else
-        {
-            <div class="table-responsive">
-                <table   class="table table-row-dashed table-row-gray-300 gy-7 js-datatables" data-datatable-title="Category export">
-                    <thead>
-                        <tr class="fw-bold fs-6 text-gray-800">
-                            <th>Name</th>
-                            <th>Status</th>
-                            <th>Created On</th>
-                            <th>Last Updated On</th>
-                            <th class="js-no-export">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var category in Model)
-                        {
-                            <tr>
-                                <td>@category.Name</td>
-                                <td>
-                                    <span class=" badge badge-light-@(category.IsDeleted ? "danger" : "success") jsStatus">
-                                        @(category.IsDeleted ? "Deleted" : "Available")
-                                    </span>
-                                </td>
-                                <td>@category.CreatedOn</td>
-                                <td class="js-updated-on">@category.LastUpdatedOn</td>
-                                <td>
-                                    <div class="dropdown ">
-                                        <button class="btn btn-secondary dropdown-toggle show" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="true">
-                                            Action
-                                        </button>
-
-                                        <ul class="dropdown-menu  " aria-labelledby="dropdownMenuButton1" style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(0px, 39px);" data-popper-placement="bottom-start">
-                                            <li><a class="dropdown-item" asp-controller="Categories" asp-action="Edit" asp-route-id="@category.Id">Edit</a></li>
-                                            <li><a class="dropdown-item js-toggle-status" data-id="@category.Id" href="javascript:;">Toggle Status</a></li>
-                                        </ul>
-                                    </div> 
-                                </td>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-row-dashed table-row-gray-300 gy-7 js-datatables" data-datatable-title="Category export">
+                        <thead>
+                            <tr class="fw-bold fs-6 text-gray-800">
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>Created On</th>
+                                <th>Last Updated On</th>
+                                <th class="js-no-export">Action</th>
                             </tr>
-                        }
-                    </tbody>
-                </table> 
-            </div>
-        }
-    </div>
+                        </thead>
+                        <tbody>
+                            @foreach (var category in Model)
+                            {
+                                <partial name="_CategoryRow" model="@category" />
+                               @* <tr>
+                                    <td>@category.Name</td>
+                                    <td>
+                                        <span class=" badge badge-light-@(category.IsDeleted ? "danger" : "success") js-status">
+                                            @(category.IsDeleted ? "Deleted" : "Available")
+                                        </span>
+                                    </td>
+                                    <td>@category.CreatedOn</td>
+                                    <td class="js-updated-on">@category.LastUpdatedOn</td>
+                                    <td>
+                                        <div class="dropdown ">
+                                            <button class="btn btn-secondary dropdown-toggle show" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="true">
+                                                Action
+                                            </button>
+
+                                            <ul class="dropdown-menu  " aria-labelledby="dropdownMenuButton1" style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(0px, 39px);" data-popper-placement="bottom-start">
+                                                <li><a class="dropdown-item" asp-controller="Categories" asp-action="Edit" asp-route-id="@category.Id">Edit</a></li>
+                                                <li><a class="dropdown-item js-toggle-status" data-url="/Categories/ToggleStatus/@category.Id" data-id="@category.Id" href="javascript:;">Toggle Status</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>*@
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
 </div>
 @section Plugins{
     <script src="~/assets/plugins/datatables/datatables.bundle.js"></script>
 }
 @Html.AntiForgeryToken();
- 
+
 @section Scripts{
     <script src="~/js/categories.js" asp-append-version="true"></script> @*f11-v1*@
 }

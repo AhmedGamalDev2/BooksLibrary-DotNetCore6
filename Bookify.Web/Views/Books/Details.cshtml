@@ -180,7 +180,7 @@
             </div>
             <!--end::Card header-->
             <div class="card-body">
-                <div class="@(Model.Copies.Any() ? "d-none" : string.Empty) alert alert-dismissible bg-light-warning border border-warning border-3 border-dashed d-flex flex-column flex-sm-row w-100 p-5 mb-10 js-alert">
+                <div class="@(Model.Copies.Any() ? "d-none" : string.Empty)  js-alert alert alert-dismissible bg-light-warning border border-warning border-3 border-dashed d-flex flex-column flex-sm-row w-100 p-5 mb-10">
                     <!--begin::Icon-->
                     <!--begin::Svg Icon | path: icons/duotune/general/gen007.svg-->
                     <span class="svg-icon svg-icon-2hx svg-icon-warning me-4 mb-5 mb-sm-0">
@@ -207,6 +207,7 @@
                             <th>Rental?</th>
                             <th>Status</th>
                             <th>Created On</th>
+                            <th>Last Updated On</th>
                             <th class="text-end">Actions</th>
                         </tr>
                     </thead>
@@ -235,7 +236,9 @@
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/books-details.js" asp-append-version="true"></script>
 
-   @* <script>
+}
+
+@* <script>
         function onAddCopySuccess(row) {
             showSuccessMessage();
             $('#Modal').modal('hide');
@@ -259,7 +262,7 @@
             KTMenu.createInstances();
         }
     </script>*@
-}
+
 
 @*Details page without modal *@
 @*@model BookViewModel

@@ -3,6 +3,7 @@
     public static class Errors
     {
         public const string MaxLenth = "Length can't be more than {1} characters";
+        public const string RequiredField = "The {0} field is required";
         public const string Dublicated = "This {0} with the same name is already existed!";
         public const string DublicatedBook = "Book  with the same title is already existed with the same author!";
         public const string NotAllowedExtenstions = "Only .png ,.jpg, .jpeg files are allowed!";

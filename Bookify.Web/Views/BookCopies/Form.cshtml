@@ -7,7 +7,8 @@
       data-ajax-success="@(Model?.Id > 0 ? "onEditCopySuccess" : "onAddCopySuccess")"
       data-ajax-failure="showErrorMessage"
       data-ajax-complete="onModalComplete">
-
+    <!--data-ajax-success="(Model?.Id > 0 ? "onEditCopySuccess" : "onAddCopySuccess")"-->
+    @*"onModalSuccess"*@
     <input type="hidden" asp-for="BookId" />
     @if (Model?.Id > 0)
     {

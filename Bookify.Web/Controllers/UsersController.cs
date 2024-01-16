@@ -14,7 +14,7 @@ using System.Text.Encodings.Web;
 
 namespace Bookify.Web.Controllers
 {
-    [Authorize(Roles =AppRoles.Admin)]
+    [Authorize(Roles = AppRoles.Admin)]
     public class UsersController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -44,7 +44,7 @@ namespace Bookify.Web.Controllers
         }
 
         [HttpGet]
-        //[AjaxOnly]
+        [AjaxOnly]
         public async Task<IActionResult> Create()
         {
             var roles = await _roleManager.Roles.ToListAsync(); //we can't send domain model but send view model
@@ -90,7 +90,7 @@ namespace Bookify.Web.Controllers
                 return BadRequest("this email existed");
             }
             #region Note (don't use automapper with ApplicationUser as Destination => only use new ApplicationUser
-            // var user = _mapper.Map<ApplicationUser>(user); //do not do that
+            // var user = _mapper.Map<ApplicationUser>(model); //do not do that
             //here we can not use automapper with ApplicationUser as Destination with UserFormViewModel
             //because automapper will initialize Id (in ApplicationUser) with null
             //but when using new keyword (in new ApplicationUser) ,it(new) will initialize Id (in ApplicationUser) with (new Guid)
@@ -121,7 +121,7 @@ namespace Bookify.Web.Controllers
                                       .Select(e => e.ErrorMessage)
                                       .ToList();
 
-            return BadRequest(string.Join(',',result.Errors.Select(e=>e.Description)));
+            return BadRequest(string.Join(',', result.Errors.Select(e => e.Description)));
 
 
             #region Ways to get current(loged) User => UserId , UserName,UserEmail...
@@ -147,25 +147,203 @@ namespace Bookify.Web.Controllers
             #endregion
         }//end
 
-        
+
+        [HttpGet]
+        //[AjaxOnly]
+        public async Task<IActionResult> Edit(string id)
+        {
+
+            var user = await _userManager.FindByIdAsync(id);
+            
+            if (user is null)
+                return NotFound();
+            
+            var viewmodel = _mapper.Map<UserFormViewModel>(user);
+            var userRoles = await _userManager.GetRolesAsync(user); //Roles that user assigned in 
+            viewmodel.SelectedRoles = userRoles; 
+           
+            var generalRoles =  _roleManager.Roles;
+            viewmodel.Roles = generalRoles.Select(r=>new SelectListItem // هنا يملأ القائمة المنسدلة
+            {
+                Value = r.Name,
+                Text = r.Name
+            }).ToList();
+
+            return PartialView("Form", viewmodel);
+           
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(UserFormViewModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.Id);
+
+            if (user is null)
+            {
+                return NotFound();
+            }
+           
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+             user = _mapper.Map(model, user);//replaced 5 elements=>fullname,username,email,normalizedemail,normalizedusername   //source:model, dest:user 
+
+            user.LastUpdatedOn = DateTime.Now;
+            user.LastUpdatedById = User?.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
+            var updated = await _userManager.UpdateAsync(user);
+            if (updated.Succeeded)
+            {
+                var oldUserRoles = await _userManager.GetRolesAsync(user);
+                var isRolesUpdated = !oldUserRoles.SequenceEqual(model.SelectedRoles);//check if there difference between two elements or not //source: oldUserRoles,second:selectedRoles
+                if (isRolesUpdated) //in case  there are difference
+                {
+                    var resultRemove = await _userManager.RemoveFromRolesAsync(user, oldUserRoles);
+                    var resultAdd = await _userManager.AddToRolesAsync(user, model.SelectedRoles);
+                }
+                var viewModel = _mapper.Map<UserViewModel>(user);
+                return PartialView("_UserRow", viewModel);
+            }
+            //if we used automapper here
+ 
+            return BadRequest();
+            #region Note
+            //when you deal with Identity with edit action don't forget edit  (NormalizedEmail,NormalizedUserName) in mapping prifile or in edit action 
+            //await _userManager.NormalizeEmail(); //if in edit action
+            //await _userManager.NormalizeName();//if in edit action
+            #endregion
+            #region another solution
+            /**
+             *  var user = await _userManager.FindByIdAsync(model.Id);
+
+            if (user is null)
+            {
+                return NotFound();
+            }
+           
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            //if we used automapper here
+            var oldUserRoles =  await _userManager.GetRolesAsync(user);
+            var resultRemove  = await _userManager.RemoveFromRolesAsync(user, oldUserRoles);
+            if (resultRemove.Succeeded)
+            {
+                var resultAdd = await _userManager.AddToRolesAsync(user, model.SelectedRoles);
+                if (resultAdd.Succeeded)
+                {
+                    user.FullName = model.FullName;
+                    user.UserName = model.Username;
+                    user.Email = model.Email;
+                    user.LastUpdatedOn = DateTime.Now;
+                    user.LastUpdatedById = User?.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+                    var viewModel = _mapper.Map<UserViewModel>(user);
+                    await _userManager.UpdateAsync(user);
+                    return PartialView("_UserRow", viewModel);
+                }
+            }
+            return BadRequest();
+             */
+            #endregion
+        }
+
+
+        /***************************************************************/
+
         public async Task<IActionResult> IsEmailExisted(UserFormViewModel model)
         {
-
             var user = await _userManager.FindByEmailAsync(model.Email);
-
             var isExisted = user is null || user.Id.Equals(model.Id);
             return Json(isExisted);
         }
-          public async Task<IActionResult> IsUserNameExisted(UserFormViewModel model)
+        public async Task<IActionResult> IsUserNameExisted(UserFormViewModel model)
         {
-
             var user = await _userManager.FindByNameAsync(model.Username);
-
             var isExisted = user is null || user.Id.Equals(model.Id);
             return Json(isExisted);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleStatus(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user is null)
+                return NotFound();
 
+            user.IsDeleted = !user.IsDeleted;
+            user.LastUpdatedById = User?.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            user.LastUpdatedOn = DateTime.Now;
+
+            await _userManager.UpdateAsync(user);//inestead of  _context.SaveChanges();
+            return Ok(user.LastUpdatedOn.ToString());
+        }
+         
+        [HttpGet]
+        [AjaxOnly]
+        public async Task<IActionResult> GetLastUpdatedOn(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user is null)
+                return NotFound();
+            var lastUpdated = user.LastUpdatedOn;
+            return Json(lastUpdated.ToString());
+        }
+
+        [HttpGet]
+        [AjaxOnly]
+
+        public async Task<IActionResult> ResetPassword(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user is null)
+                return NotFound();
+            var viewModel = new UserResetPasswordViewModel { Id = user.Id };
+            return PartialView("ResetPasswordForm", viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(UserResetPasswordViewModel model)
+        {//like Edit
+            var user = await _userManager.FindByIdAsync(model.Id);
+
+            if (user is null)
+                return NotFound();
+            if (model.Password == model.ConfirmPassword)
+            {
+                var oldPasswordHash = user.PasswordHash;
+                await _userManager.RemovePasswordAsync(user);
+
+                var result = await _userManager.AddPasswordAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    user.LastUpdatedById = User?.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+                    user.LastUpdatedOn = DateTime.Now;
+
+                    var viewModel = _mapper.Map<UserViewModel>(user);
+
+                    await _userManager.UpdateAsync(user);//you must write this //inestead of  _context.SaveChanges();
+
+                    return PartialView("_UserRow", viewModel);
+
+                }
+                user.PasswordHash = oldPasswordHash;
+                await _userManager.UpdateAsync(user);//you must write this //inestead of  _context.SaveChanges();
+
+                //return BadRequest();
+                return BadRequest(string.Join(',', result.Errors.Select(e => e.Description)));
+
+            }
+            return BadRequest();
+        }
     }
 
 

@@ -17,6 +17,6 @@ function onEditCopySuccess(row) {
     showSuccessMessage();
     $('#Modal').modal('hide');
 
-    $(updatedRow).replaceWith(row);
+    $(updatedrow).replaceWith(row);
     KTMenu.createInstances();
 }
