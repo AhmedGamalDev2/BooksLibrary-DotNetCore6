@@ -1,4 +1,14 @@
-﻿<!--begin::Header-->
+﻿@inject IWebHostEnvironment WebHostEnvironment
+
+@{
+
+    var avatarUrl = $"{WebHostEnvironment.WebRootPath}/images/users/{User.FindFirst(ClaimTypes.NameIdentifier)!.Value}.png"; //this to check if there image in this path or not
+
+    avatarUrl = System.IO.File.Exists(avatarUrl) ?
+         $"/images/users/{User.FindFirst(ClaimTypes.NameIdentifier)!.Value}.png"
+        : "/assets/images/avatar.png";
+}
+<!--begin::Header-->
 <div id="kt_header" class="header">
     <!--begin::Container-->
     <div class="container-fluid d-flex flex-stack">
@@ -133,7 +143,8 @@
                     <!--end::Name-->
                     <!--begin::Symbol-->
                     <div class="symbol symbol-30px symbol-md-40px">
-                        <img src="~/assets/images/avatar.png" alt="image" />
+                        <img src="@avatarUrl" alt="image" />
+                        @*<img src="~/assets/images/avatar.png" alt="image" />*@
                     </div>
                     <!--end::Symbol-->
                 </div>
@@ -145,7 +156,8 @@
                         <div class="menu-content d-flex align-items-center px-3">
                             <!--begin::Avatar-->
                             <div class="symbol symbol-50px me-5">
-                                <img alt="Logo" src="~/assets/images/avatar.png" />
+                                <img alt="Logo" src="@avatarUrl" />
+                                @*<img alt="Logo" src="~/assets/images/avatar.png" />*@
                             </div>
                             <!--end::Avatar-->
                             <!--begin::Username => FullName not Username-->

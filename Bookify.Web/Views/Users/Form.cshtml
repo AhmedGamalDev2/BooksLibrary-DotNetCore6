@@ -50,7 +50,7 @@
     *@
 
     <div class="mb-5">
-        <div class="mb-2">
+        <div class="form-floating  mb-2">
             <select class="form-select form-select-solid js-select2" data-placeholder="Select Roles" asp-for="SelectedRoles" asp-items="@Model?.Roles">
             </select>
             <label asp-for="SelectedRoles"></label>
@@ -64,6 +64,7 @@
     {
         <div class="mb-5">
             <div class="form-floating mb-2">
+                @*form-floating for floating placeholder*@
                 <input type="password" placeholder="Password" asp-for="Password" class="form-control form-control-solid " />@* @(!string.IsNullOrEmpty(Model?.Id) ? "d-none" : "")*@
                 <label asp-for="Password"></label>
             </div>

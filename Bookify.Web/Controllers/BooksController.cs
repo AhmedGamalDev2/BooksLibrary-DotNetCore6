@@ -1,5 +1,6 @@
 ﻿using Bookify.Web.Core.Consts;
 using Bookify.Web.Filters;
+using Bookify.Web.Services;
 using Bookify.Web.Settings;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
 using System.Linq.Dynamic.Core;
+
 
 namespace Bookify.Web.Controllers
 {
@@ -17,10 +19,13 @@ namespace Bookify.Web.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IMapper _mapper;
         private readonly Cloudinary _cloudinary;
+        private readonly IImageService _imageService;
+
+
         private List<string> _allowedExtensions = new() { ".jpg", ".jpeg", ".png", ".webp" };
         private int _maxAllowedSize = 2097152;
 
-        public BooksController(ApplicationDbContext context, IMapper mapper, IWebHostEnvironment webHostEnvironment, IOptions<CloudinarySettings> cloudinary)
+        public BooksController(ApplicationDbContext context, IMapper mapper, IWebHostEnvironment webHostEnvironment, IOptions<CloudinarySettings> cloudinary, IImageService imageService)
         {
             _context = context;
             _mapper = mapper;
@@ -33,13 +38,14 @@ namespace Bookify.Web.Controllers
 
             };
             _cloudinary = new Cloudinary(account);
+            _imageService = imageService;
         }
         public IActionResult Index()
         {
             return View();
         }
 
-         
+
         [HttpPost]
         public IActionResult GetBooks()
         {
@@ -78,11 +84,11 @@ namespace Bookify.Web.Controllers
             var book = _context.Books
                 .Include(book => book.Author)
                   .Include(b => b.Copies)
-                .Include(b=>b.Categories)
-                .ThenInclude(s=>s.Category) // this Category that is inside BookCategory (ThenInclude is very usefull)
-                .SingleOrDefault(b => b.Id == id );
-           
-            if(book is null)
+                .Include(b => b.Categories)
+                .ThenInclude(s => s.Category) // this Category that is inside BookCategory (ThenInclude is very usefull)
+                .SingleOrDefault(b => b.Id == id);
+
+            if (book is null)
             {
                 return NotFound();
             }
@@ -130,9 +136,33 @@ namespace Bookify.Web.Controllers
             }
             var book = _mapper.Map<Book>(model); // Image cannot map with automapper
             book.CreatedById = User?.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
+
+            #region Deal with image using service (ImageService)
+            //this service not studied well , we copied it and pasted it from ElHelaly Code
+            if (model.Image is not null)
+            {
+                var imageName = $"{Guid.NewGuid()}{Path.GetExtension(model.Image.FileName)}";
+
+                var (isUploaded, errorMessage) = await _imageService.UploadAsync(model.Image, imageName, "/images/books", hasThumbnail: true);
+
+                if (!isUploaded)
+                {
+                    ModelState.AddModelError(nameof(Image), errorMessage!);
+                    return View("Form", PopulateViewModel(model));
+
+                }
+
+                book.ImageUrl = $"/images/books/{imageName}";
+                book.ImageThumbnailUrl = $"/images/books/thumb/{imageName}";
+            }
+
+            #endregion
+            #region Deal with image without using service (ImageService) 
             //deal with image
             if (model.Image is not null)
             {
+                /* (without service ImageService)
                 var extension = Path.GetExtension(model.Image.FileName);
                 if (!_allowedExtensions.Contains(extension))
                 {
@@ -146,27 +176,30 @@ namespace Bookify.Web.Controllers
                 }
                 //save image in database and in application
                 var imageName = $"{Guid.NewGuid()}{extension}"; // change name of image in database and in wwwroot
-
+                */
                 #region Save image in local server, this deals with out resource (Operating System)
-                    #region Save original image
-                    var path = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books", imageName); //this save image in wwwroot/images/books ,, (_webHostEnvironment.WebRootPath) => get path until wwwroot
-                    using var stream = System.IO.File.Create(path); // save that this Iformfile(image) in that path
-                    await model.Image.CopyToAsync(stream); // copy model.Image in stream that its role save it in path
-                    stream.Dispose();//stop this stream to i can start another stream
-                    //book.ImageUrl =imageName;//this save image Name in database(ImageUrl)
-                    book.ImageUrl = $"/images/books/{imageName}";//this save imageUrl in database(ImageUrl)
-                    #endregion
-                    #region Save thumbnail image 
-                    //how to create and generate thumbnail with backage SixLabors.ImageSharp.Web
-                    using var image = Image.Load(model.Image.OpenReadStream());
-                    var ratio = (float)image.Width / 200;
-                    var height = image.Height / ratio;
-                    image.Mutate(i => i.Resize(width: 200, height: (int)height)); // to resize the image
-                    var thumbPath = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books/thumb", imageName); //this save image in wwwroot/images/books ,, (_webHostEnvironment.WebRootPath) => get path until wwwroot
-                    image.Save(thumbPath); //to save thumbnail in local server
-                    book.ImageThumbnailUrl = $"/images/books/thumb/{imageName}";//this save imageThumbnailUrl in database(ThumbnailUrl)
-
-                    #endregion
+                #region Save original image
+                /*(without service ImageSerice)
+                var path = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books", imageName); //this save image in wwwroot/images/books ,, (_webHostEnvironment.WebRootPath) => get path until wwwroot
+                using var stream = System.IO.File.Create(path); // save that this Iformfile(image) in that path
+                await model.Image.CopyToAsync(stream); // copy model.Image in stream that its role save it in path
+                stream.Dispose();//stop this stream to i can start another stream
+                                 //book.ImageUrl =imageName;//this save image Name in database(ImageUrl)
+                book.ImageUrl = $"/images/books/{imageName}";//this save imageUrl in database(ImageUrl)
+                */
+                #endregion
+                #region Save thumbnail image 
+                /*(without service ImageSerice)
+                //how to create and generate thumbnail with backage SixLabors.ImageSharp.Web
+                using var image = Image.Load(model.Image.OpenReadStream());
+                var ratio = (float)image.Width / 200;
+                var height = image.Height / ratio;
+                image.Mutate(i => i.Resize(width: 200, height: (int)height)); // to resize the image
+                var thumbPath = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books/thumb", imageName); //this save image in wwwroot/images/books ,, (_webHostEnvironment.WebRootPath) => get path until wwwroot
+                image.Save(thumbPath); //to save thumbnail in local server
+                book.ImageThumbnailUrl = $"/images/books/thumb/{imageName}";//this save imageThumbnailUrl in database(ThumbnailUrl)
+                */
+                #endregion
                 #endregion
                 #region Save image in Cloudninary server instead of local server
                 //using var stream = model.Image.OpenReadStream();// create stream for image
@@ -182,6 +215,8 @@ namespace Bookify.Web.Controllers
                 #endregion
             }
 
+            #endregion
+
             foreach (var item in model.SelectedCategoryIds)
             { //fill BookCategory table
                 book.Categories.Add(new BookCategory { CategoryId = item });
@@ -189,10 +224,10 @@ namespace Bookify.Web.Controllers
 
             _context.Books.Add(book);
             _context.SaveChanges();
-            return RedirectToAction(nameof(Details),new {id= book.Id});// here(id field) must equal and be the same Details parameter(int id)
+            return RedirectToAction(nameof(Details), new { id = book.Id });// here(id field) must equal and be the same Details parameter(int id)
         }
-        //[HttpGet]
-        [AjaxOnly]
+        [HttpGet]
+      
         public IActionResult Edit(int id)
         {
             var book = _context.Books.Include(b => b.Categories).SingleOrDefault(b => b.Id == id);
@@ -224,12 +259,43 @@ namespace Bookify.Web.Controllers
             }
             var book = _context.Books
                 .Include(b => b.Categories)
-                .Include(book=>book.Copies).SingleOrDefault(b => b.Id == model.Id);
+                .Include(book => book.Copies).SingleOrDefault(b => b.Id == model.Id);
             if (book is null)
             {
                 return NotFound();
             }
 
+
+            #region Deal with image using service(ImageService)
+            if (model.Image is not null)
+            {
+                if (!string.IsNullOrEmpty(book.ImageUrl))
+                {
+                    _imageService.Delete(book.ImageUrl, book.ImageThumbnailUrl);
+
+                    //await _cloudinary.DeleteResourcesAsync(book.ImagePublicId);
+                }
+
+                var imageName = $"{Guid.NewGuid()}{Path.GetExtension(model.Image.FileName)}";
+
+                var (isUploaded, errorMessage) = await _imageService.UploadAsync(model.Image, imageName, "/images/books", hasThumbnail: true);
+
+                if (!isUploaded)
+                {
+                    ModelState.AddModelError(nameof(Image), errorMessage!);
+                    return View("Form", PopulateViewModel(model));
+                }
+
+                model.ImageUrl = $"/images/books/{imageName}";
+                model.ImageThumbnailUrl = $"/images/books/thumb/{imageName}";
+            }
+            else if (!string.IsNullOrEmpty(book.ImageUrl))//model.Image is null & 
+            {
+                model.ImageUrl = book.ImageUrl;
+                model.ImageThumbnailUrl = book.ImageThumbnailUrl; //by save thumbnail  image
+            }
+            #endregion
+            #region Deal with image without using service (ImageService)
             //deal with image
             //in case model.Image not null and (there is old image or there is not old image)
             if (model.Image is not null)
@@ -239,20 +305,22 @@ namespace Bookify.Web.Controllers
                 {
                     #region deal with local server
                     //var oldImagePath = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books", book.ImageUrl); //on the server, this before thumbnail image
-                        #region Deal with original image
-                        var oldImagePath = $"{_webHostEnvironment.WebRootPath}{book.ImageUrl}"; //on the server
-                        if (System.IO.File.Exists(oldImagePath))// is there file in that path ,if yes delete it 
-                        {
-                            System.IO.File.Delete(oldImagePath);
-                        }
-                        #endregion
-                        #region Deal with thumbnail image
-                        var oldThumbPath = $"{_webHostEnvironment.WebRootPath}{book.ImageThumbnailUrl}"; //on the server
-                        if (System.IO.File.Exists(oldThumbPath))//delete thumbnail image// is there file in that path ,if yes delete it 
-                        {
-                            System.IO.File.Delete(oldThumbPath);
-                        }
-                        #endregion
+                    #region Deal with original image
+                    /*(without service ImageService)
+                       var oldImagePath = $"{_webHostEnvironment.WebRootPath}{book.ImageUrl}"; //on the server
+                       if (System.IO.File.Exists(oldImagePath))// is there file in that path ,if yes delete it 
+                       {
+                           System.IO.File.Delete(oldImagePath);
+                       }*/
+                    #endregion
+                    #region Deal with thumbnail image
+                    /*(without service ImageService)
+                     * var oldThumbPath = $"{_webHostEnvironment.WebRootPath}{book.ImageThumbnailUrl}"; //on the server
+                    if (System.IO.File.Exists(oldThumbPath))//delete thumbnail image// is there file in that path ,if yes delete it 
+                    {
+                        System.IO.File.Delete(oldThumbPath);
+                    }*/
+                    #endregion
                     #endregion
                     #region Deal with cloudinary
                     // Delete the old image from Cloudinary
@@ -260,6 +328,7 @@ namespace Bookify.Web.Controllers
                     #endregion
                 }
                 // in case model.Image  is new image(there is not old image)
+                /*(without service ImageService)
                 var extension = Path.GetExtension(model.Image.FileName);
                 if (!_allowedExtensions.Contains(extension))
                 {
@@ -273,27 +342,29 @@ namespace Bookify.Web.Controllers
                 }
                 //save image in database and in application(server)
                 var imageName = $"{Guid.NewGuid()}{extension}"; // change name of image in database and in wwwroot(on server)(Guid name)
-
+                */
                 #region Save image in local server, this deals with out resource (Operating System)
-                    #region Save original image
-                    var path = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books", imageName); //this save image in wwwroot/images/books ,, (_webHostEnvironment.WebRootPath) => get path until wwwroot
-                    using var stream = System.IO.File.Create(path); // save that this Iformfile(image) in that path or create file in this path
-                    await model.Image.CopyToAsync(stream); // created file in that path put this data(model.Image) in it
-                    //model.ImageUrl = imageName;//this map in automapper && this save image in database(old)
-                    model.ImageUrl = $"/images/books/{imageName}";//this map in automapper && this save imageUrl in database
-
-                    #endregion
-                    #region Save thumbnail image
-                    //how to create and generate thumbnail with backage imagesharp
-                    using var image = Image.Load(model.Image.OpenReadStream());
-                    var ratio = (float)image.Width / 200;
-                    var height = image.Height / ratio;
-                    image.Mutate(i => i.Resize(width: 200, height: (int)height)); // to resize the image
-                    var thumbPath = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books/thumb", imageName); //this save image in wwwroot/images/books ,, (_webHostEnvironment.WebRootPath) => get path until wwwroot
-                    image.Save(thumbPath); //to save thumbnail in local server
-                    model.ImageThumbnailUrl = $"/images/books/thumb/{imageName}";//this save imageThumbnailUrl in database(ThumbnailUrl)
-
-                    #endregion
+                #region Save original image
+                /*(without service ImageService)
+                var path = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books", imageName); //this save image in wwwroot/images/books ,, (_webHostEnvironment.WebRootPath) => get path until wwwroot
+                using var stream = System.IO.File.Create(path); // save that this Iformfile(image) in that path or create file in this path
+                await model.Image.CopyToAsync(stream); // created file in that path put this data(model.Image) in it
+                                                       //model.ImageUrl = imageName;//this map in automapper && this save image in database(old)
+                model.ImageUrl = $"/images/books/{imageName}";//this map in automapper && this save imageUrl in database
+                */
+                #endregion
+                #region Save thumbnail image
+                //how to create and generate thumbnail with backage imagesharp
+                /*(without service ImageService)
+                using var image = Image.Load(model.Image.OpenReadStream());
+                var ratio = (float)image.Width / 200;
+                var height = image.Height / ratio;
+                image.Mutate(i => i.Resize(width: 200, height: (int)height)); // to resize the image
+                var thumbPath = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books/thumb", imageName); //this save image in wwwroot/images/books ,, (_webHostEnvironment.WebRootPath) => get path until wwwroot
+                image.Save(thumbPath); //to save thumbnail in local server
+                model.ImageThumbnailUrl = $"/images/books/thumb/{imageName}";//this save imageThumbnailUrl in database(ThumbnailUrl)
+                */
+                #endregion
                 #endregion
                 #region Save image in Cloudninary server instead of local server
                 //// Save image in Cloudinary server
@@ -311,12 +382,17 @@ namespace Bookify.Web.Controllers
                 #endregion
             }
             //in case model.Image is null
+            /*(without service ImageService)
             else if (!string.IsNullOrEmpty(book.ImageUrl))//model.Image is null & 
             {
                 model.ImageUrl = book.ImageUrl;
                 model.ImageThumbnailUrl = book.ImageThumbnailUrl; //by save thumbnail  image
-            }
-            book = _mapper.Map(model, book); 
+            }*/
+            #endregion
+
+
+
+            book = _mapper.Map(model, book);
             book.LastUpdatedOn = DateTime.Now;
             book.LastUpdatedById = User?.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             //book.ImagePublicId = imagePublicId; //cloudinary
@@ -327,13 +403,13 @@ namespace Bookify.Web.Controllers
             }
             if (!model.IsAvailableForRental)
             { // if the book is not available for rental so all copies (related with it) is not available for rental
-                foreach(var copy in book.Copies)
+                foreach (var copy in book.Copies)
                 {
                     copy.IsAvailableForRental = false;
                 }
             }
             _context.SaveChanges();
-            return RedirectToAction(nameof(Details),new {id=book.Id}); // here(id field) must equal and be the same Details parameter(int id)
+            return RedirectToAction(nameof(Details), new { id = book.Id }); // here(id field) must equal and be the same Details parameter(int id)
         }
 
         [HttpPost]
@@ -359,7 +435,7 @@ namespace Bookify.Web.Controllers
 
             return Json(isAllowed);
         }
-         
+
         public BookFormViewModel PopulateViewModel(BookFormViewModel? model = null)
         {
             BookFormViewModel viewModel = model is null ? new BookFormViewModel() : model; // in case create(get&post) and edit(get&post)

@@ -15,6 +15,9 @@ namespace Bookify.Web.Data
         public virtual DbSet<BookCategory> BookCategories { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public DbSet<BookCopy> BookCopies { get; set; }
+        public DbSet<Subscriber> Subscribers { get; set; }
+        public DbSet<Governorate> Governorates { get; set; }
+        public DbSet<Area> Areas { get; set; }
 
 
         #endregion
@@ -28,6 +31,17 @@ namespace Bookify.Web.Data
                            .HasDefaultValueSql("NEXT VALUE FOR shared.SerialNumber");
  
             builder.Entity<BookCategory>(e => e.HasKey(b => new {b.BookId,b.CategoryId})); // assign primary key for BookCategory entity 
+
+            #region Apply Restrict on all onModelDelete instead of Cascade(the better to do(restrict all delete behavior) that in beginning of program or project)
+            var cascadeFKs = builder.Model.GetEntityTypes()
+                .SelectMany(t => t.GetForeignKeys())
+                .Where(fk => fk.DeleteBehavior == DeleteBehavior.Cascade && !fk.IsOwnership);
+            foreach(var fk in cascadeFKs)
+            {
+                fk.DeleteBehavior = DeleteBehavior.Restrict;
+            }
+            #endregion
+
             base.OnModelCreating(builder);
         }
 

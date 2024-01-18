@@ -21,7 +21,7 @@
     </div>
     <div class="card-body">
         <form method="post" asp-controller="Books" enctype="multipart/form-data" id="FormForFooter">
-            <!-- enctype="multipart/form-data" => this for upload file(like image) with form -->
+            <!-- enctype="multipart/form-data" => this for upload file(like image) with form => it must to upload this image or file to server , without it the image not showen or not upload to server  -->
             @*Id*@
             @if (Model?.Id > 0)
             {
@@ -117,7 +117,7 @@
                     <div class="row">
                         <div class="col">
                             <div class="mb-5">
-                                <div class="mb-2">
+                                <div class=" form-floating  mb-2">
                                     <select class="form-select form-select-solid js-select2" data-placeholder="Select categories" asp-for="SelectedCategoryIds" asp-items="@Model?.Categories">
                                       
                                     </select>

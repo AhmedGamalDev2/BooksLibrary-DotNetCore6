@@ -2,6 +2,7 @@
 using Bookify.Web.Helpers;
 using Bookify.Web.Seedings;
 using Bookify.Web.Seeds;
+using Bookify.Web.Services;
 using Bookify.Web.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
@@ -103,6 +104,7 @@ builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, Applica
 builder.Services.AddControllersWithViews();
 builder.Services.AddAutoMapper(assemblies: AssemblyBuilder.GetAssembly(typeof(Mappingprofile)));
 builder.Services.AddExpressiveAnnotations();
+builder.Services.AddTransient<IImageService, ImageService>();
 
 
 var app = builder.Build();

@@ -40,7 +40,7 @@ namespace Bookify.Web.Controllers
         }
 
         [HttpGet]
-        [AjaxOnly]
+        
         public IActionResult Create()
         {
             return View("Form");
@@ -65,7 +65,7 @@ namespace Bookify.Web.Controllers
         }
 
         [HttpGet]
-        [AjaxOnly]
+       
         public IActionResult Edit(int id)
         {
             var category = _context.Categories.Find(id);
